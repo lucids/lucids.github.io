@@ -4,7 +4,7 @@
   <title><![CDATA[Lucids]]></title>
   <link href="http://lucids.github.io/atom.xml" rel="self"/>
   <link href="http://lucids.github.io/"/>
-  <updated>2014-01-11T00:54:18+00:00</updated>
+  <updated>2014-01-12T18:28:31+00:00</updated>
   <id>http://lucids.github.io/</id>
   <author>
     <name><![CDATA[Lucids]]></name>
@@ -12,6 +12,1049 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[A Taste of Functional Programming in Java 7, Java 8 and C# 4]]></title>
+    <link href="http://lucids.github.io/blog/a-taste-of-functional-programming-in-java-7/"/>
+    <updated>2014-01-12T18:08:02+00:00</updated>
+    <id>http://lucids.github.io/blog/a-taste-of-functional-programming-in-java-7</id>
+    <content type="html"><![CDATA[<h2>Keywords</h2>
+
+<p><strong>Java</strong>, <strong>C#, Java 8</strong>, <strong>Functional Programming</strong>, <strong><a href="https://code.google.com/p/guava-libraries/">Guava</a></strong></p>
+
+<h2>Abstract</h2>
+
+<p>By introducing a real-world problem, this article shows how Java 7 failed to solve it elegantly, how Java 8 make it better by the help of <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a> and <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a>, and how C# 4 make it even better with the power of <a href="http://msdn.microsoft.com/en-us/library/bb397696.aspx">Anonymous Type</a> and <a href="http://msdn.microsoft.com/en-us/library/bb397926.aspx">LINQ</a>.</p>
+
+<h2>Problem</h2>
+
+<h3>Definition</h3>
+
+<p>We&rsquo;ve got some timing records from our log. These records are stored in a <code>Map&lt;String, Range&gt;</code>. Now we need to visualize them.</p>
+
+<p><code>Range</code> is a closed-open range.</p>
+
+<figure class='code'><figcaption><span>Definition of class Range</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">class</span> <span class="nc">Range</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">begin</span><span class="o">;</span>
+</span><span class='line'>  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">int</span> <span class="n">end</span><span class="o">;</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="nf">Range</span><span class="o">(</span><span class="kt">int</span> <span class="n">begin</span><span class="o">,</span> <span class="kt">int</span> <span class="n">end</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">begin</span> <span class="o">=</span> <span class="n">begin</span><span class="o">;</span>
+</span><span class='line'>    <span class="k">this</span><span class="o">.</span><span class="na">end</span> <span class="o">=</span> <span class="n">end</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'>  <span class="kd">public</span> <span class="kt">int</span> <span class="nf">length</span><span class="o">()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="n">end</span> <span class="o">-</span> <span class="n">begin</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>interface of this function</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByName</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Example input</h3>
+
+<figure class='code'><figcaption><span>example input</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='js'><span class='line'><span class="nx">data</span> <span class="o">=</span> <span class="p">{</span>
+</span><span class='line'>  <span class="s1">&#39;Action1&#39;</span> <span class="o">:</span> <span class="nx">Range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">10</span><span class="p">),</span>
+</span><span class='line'>  <span class="s1">&#39;Act2&#39;</span> <span class="o">:</span> <span class="nx">Range</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span>
+</span><span class='line'>  <span class="s1">&#39;Action3&#39;</span> <span class="o">:</span> <span class="nx">Range</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+</span><span class='line'>  <span class="s1">&#39;Trivial&#39;</span> <span class="o">:</span> <span class="nx">Range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+</span><span class='line'><span class="p">},</span>
+</span><span class='line'><span class="nx">stepSize</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Expected output</h3>
+
+<figure class='code'><figcaption><span>expected output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="nl">Action1:</span> <span class="o">*----</span>
+</span><span class='line'>   <span class="nl">Act2:</span> <span class="o">-**--</span>
+</span><span class='line'><span class="nl">Action3:</span> <span class="o">--***</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><strong>NOTE</strong>: This example input will be used in the whole article.</p>
+
+<h3>Requirements</h3>
+
+<ol>
+<li>Records in the output should keep an ascending order by its range begin value.</li>
+<li><code>stepSize</code> is given to transform record range to chart range.</li>
+<li>The <strong>n</strong>th symbol represents <code>Range(n * stepSize, (n + 1) * stepSize - 1)</code>.</li>
+<li><code>-</code> represents idle, <code>*</code> represents busy. e.g. <code>Range(10, 30)</code> in the enclosing <code>Range(0, 50)</code> should be <code>-**--</code></li>
+</ol>
+
+
+<h3>Caveats</h3>
+
+<ol>
+<li>Trivial input(which can not make one step) should be removed.</li>
+<li>Alignment is needed, as you see, <strong>Act2</strong> is right aligned with other record names.</li>
+<li>Return an empty string if input is empty, or if all records are trivial.</li>
+</ol>
+
+
+<h2>How to solve it</h2>
+
+<p>This article focuses on language features instead of algorithm design or problem analysis, so I won&rsquo;t go any further than listing steps below:</p>
+
+<ol>
+<li>Does some sanity check.</li>
+<li>Transforms each record from data to appropriate string form like <code>Action1: -**--</code>.</li>
+<li> Calculates how many symbols are needed for each entry
+
+<ol>
+<li>Gets the enclosing <code>Range</code> of all ranges</li>
+<li>Transforms each record range(<code>Range(10, 30)</code>) into the actual range(<code>Range(1, 3)</code>) in the <code>String</code> form(<code>-**--</code>) from the enclosing range(<code>Range(0, 50)</code>) and stepSize(<code>10</code>).</li>
+</ol>
+</li>
+<li> Gets the length of longest name of all records for further alignment.</li>
+<li> Gets the proper string representation of each record.</li>
+<li>Joins the string list by a line return separator and return.</li>
+</ol>
+
+
+<h2>Coding in &ldquo;old&rdquo; java way</h2>
+
+<p>Firstly I&rsquo;ll implement the solution in Java 7 with the help of <a href="https://code.google.com/p/guava-libraries/">Guava</a>, the de facto java library of Google.</p>
+
+<h3>1. Does some sanity check</h3>
+
+<p><a href="https://code.google.com/p/guava-libraries/">Guava</a> provides some neat checks in <code>com.google.common.base.Preconditions.*</code>:</p>
+
+<figure class='code'><figcaption><span>Sanity check using Preconditions in Guava</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">base</span><span class="o">.</span><span class="na">Preconditions</span><span class="o">.</span><span class="na">checksNotNull</span><span class="o">;</span>
+</span><span class='line'><span class="kn">import</span> <span class="nn">static</span> <span class="n">com</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">common</span><span class="o">.</span><span class="na">base</span><span class="o">.</span><span class="na">Preconditions</span><span class="o">.</span><span class="na">checksArgument</span><span class="o">;</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava7</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">checkNotNull</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">checkArgument</span><span class="o">(!</span><span class="n">data</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">stepSize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">);</span>
+</span><span class='line'><span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>2. Transforms each record to appropriate string form</h3>
+
+<h4>2.1. Calculates how many symbols are needed for each record</h4>
+
+<h5>2.1.1. Gets the enclosing range of all ranges</h5>
+
+<p>Calculating the enclosing <code>Range</code> is straightforward: Foreach the <code>Range</code> in  <code>Map&lt;String, Range&gt;</code> then take the minimum <code>begin</code> as enclosing begin and the maximum <code>end</code> as enclosing end.</p>
+
+<figure class='code'><figcaption><span>Gets enclosing range in an imperative style</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">Range</span> <span class="nf">getEnclosingRange</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Range</span><span class="o">&gt;</span> <span class="n">ranges</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">enclosingBegin</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">MAX_VALUE</span><span class="o">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">enclosingEnd</span> <span class="o">=</span> <span class="n">Integer</span><span class="o">.</span><span class="na">MIN_VALUE</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">for</span> <span class="o">(</span><span class="n">Range</span> <span class="n">range</span> <span class="o">:</span> <span class="n">ranges</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">range</span><span class="o">.</span><span class="na">begin</span> <span class="o">&lt;</span> <span class="n">enclosingBegin</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">enclosingBegin</span> <span class="o">=</span> <span class="n">range</span><span class="o">.</span><span class="na">begin</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>    <span class="k">if</span> <span class="o">(</span><span class="n">range</span><span class="o">.</span><span class="na">end</span> <span class="o">&gt;</span> <span class="n">enclosingEnd</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">enclosingEnd</span> <span class="o">=</span> <span class="n">range</span><span class="o">.</span><span class="na">end</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">new</span> <span class="nf">Range</span><span class="o">(</span><span class="n">enclosingBegin</span><span class="o">,</span> <span class="n">enclosingEnd</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Although <a href="https://code.google.com/p/guava-libraries/">Guava</a> has a <a href="https://code.google.com/p/guava-libraries/wiki/OrderingExplained">Ordering</a> which can handle the min/max operation in a declarative way, but it won&rsquo;t simplify the code here:</p>
+
+<figure class='code'><figcaption><span>Gets enclosing range in a declarative style</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">Range</span> <span class="nf">getEnclosingRange</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Range</span><span class="o">&gt;</span> <span class="n">ranges</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">enclosingBegin</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ordering</span><span class="o">&lt;</span><span class="n">Range</span><span class="o">&gt;(){</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Range</span> <span class="n">left</span><span class="o">,</span> <span class="n">Range</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">begin</span><span class="o">,</span> <span class="n">right</span><span class="o">.</span><span class="na">begin</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}.</span><span class="na">max</span><span class="o">(</span><span class="n">ranges</span><span class="o">).</span><span class="na">begin</span><span class="o">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">enclosingEnd</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ordering</span><span class="o">&lt;</span><span class="n">Range</span><span class="o">&gt;(){</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Range</span> <span class="n">left</span><span class="o">,</span> <span class="n">Range</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">end</span><span class="o">,</span> <span class="n">right</span><span class="o">.</span><span class="na">end</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}.</span><span class="na">max</span><span class="o">(</span><span class="n">ranges</span><span class="o">).</span><span class="na">end</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">new</span> <span class="nf">Range</span><span class="o">(</span><span class="n">enclosingBegin</span><span class="o">,</span> <span class="n">enclosingEnd</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Actually it&rsquo;s even 2 lines more than the imperative style! But it is really not <a href="https://code.google.com/p/guava-libraries/">Guava</a>&rsquo;s fault. Java 7&rsquo;s verbose <em>annoynymous</em> class syntax made the should-be-clear code a mess.</p>
+
+<p>I decided to use a consistent declarative style here, so I will keep the one with <a href="https://code.google.com/p/guava-libraries/wiki/OrderingExplained">Ordering</a>.</p>
+
+<h5>2.1.2. Gets transformed entries from the enclosing range and stepSize</h5>
+
+<h5>2.1.3. Filters trivial entries and sorts them by range&rsquo;s begin</h5>
+
+<p><a href="https://code.google.com/p/guava-libraries/">Guava</a> provides <a href="https://code.google.com/p/guava-libraries/wiki/FunctionalExplained">FluentIterable</a> for processing collection in a &ldquo;fluent&rdquo; interface, so I combined the transforming, filtering and sorting together.</p>
+
+<p>Firstly I used <code>FluentIterable#transform</code> to transform entries to the &ldquo;representing form&rdquo;(e.g. <code>Range(10,30)</code> with a enclosing <code>Range(0,50)</code> and stepSize <code>10</code> will be transformed into <code>Range(1,3)</code>, which matches its string form <code>-**--</code>)</p>
+
+<figure class='code'><figcaption><span>transform entries</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava7</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="n">Range</span> <span class="n">enclosingRange</span> <span class="o">=</span> <span class="n">getEnclosingRange</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">());</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">totalLength</span> <span class="o">=</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">length</span><span class="o">();</span>
+</span><span class='line'>  <span class="n">List</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;</span> <span class="n">filteredAndSortedEntries</span> <span class="o">=</span> <span class="n">FluentIterable</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">entrySet</span><span class="o">())</span>
+</span><span class='line'>    <span class="o">.</span><span class="na">transform</span><span class="o">(</span><span class="k">new</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;,</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;()</span> <span class="o">{</span>
+</span><span class='line'>      <span class="nd">@Override</span>
+</span><span class='line'>      <span class="kd">public</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">apply</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>        <span class="n">Range</span> <span class="n">range</span> <span class="o">=</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+</span><span class='line'>        <span class="k">return</span> <span class="n">Maps</span><span class="o">.</span><span class="na">immutableEntry</span><span class="o">(</span><span class="n">input</span><span class="o">.</span><span class="na">getKey</span><span class="o">(),</span> <span class="k">new</span> <span class="n">Range</span><span class="o">(</span>
+</span><span class='line'>            <span class="o">(</span><span class="n">range</span><span class="o">.</span><span class="na">begin</span> <span class="o">-</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">begin</span><span class="o">)</span> <span class="o">/</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">length</span><span class="o">(),</span>
+</span><span class='line'>            <span class="o">(</span><span class="n">range</span><span class="o">.</span><span class="na">end</span> <span class="o">-</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">end</span><span class="o">)</span> <span class="o">/</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">length</span><span class="o">()));</span>
+</span><span class='line'>      <span class="o">}</span>
+</span><span class='line'>    <span class="o">})</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then I used <code>FluentIterable#filter</code> to filter out trivial entries(<code>length &lt; 1</code>).</p>
+
+<figure class='code'><figcaption><span>only keep non-trivial entries</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="k">new</span> <span class="n">Predicate</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">})</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally <code>FluentIterable#toSortedList</code> is used to get a sorted entry list, a custom <code>Comparator</code> is provided here to sort entries by range&rsquo;s begin value.</p>
+
+<figure class='code'><figcaption><span>sort entries by Range#begin</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">toSortedList</span><span class="o">(</span><span class="k">new</span> <span class="n">Comparator</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;(){</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">,</span> <span class="n">right</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">});</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Since the enty list might be empty after filtering, I added a early return here. It also prevents Exception from possible <code>Ordering#max</code> invoking.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">filteredAndSortedEntries</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>2.2. Gets the length of longest name for further alignment.</h4>
+
+<p>Before getting the string list, we need to get the longest name&rsquo;s length so we can make a <strong>right</strong> alignment.</p>
+
+<p><a href="https://code.google.com/p/guava-libraries/wiki/OrderingExplained">Ordering</a> was used to get the longest length, it should be noticed that <code>Ordering#max</code> would throw an Exception if input interables are empty.</p>
+
+<figure class='code'><figcaption><span>Gets length of the longest name</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava7</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">longestNameLength</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ordering</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">Range</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">Range</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">(),</span> <span class="n">right</span><span class="o">.</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}.</span><span class="na">max</span><span class="o">(</span><span class="n">filteredAndSortedEntries</span><span class="o">).</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>2.3. Gets the proper string representation of each entry.</h4>
+
+<p><code>FluentIterable#transform</code> is used here to transform entry list to string list.</p>
+
+<figure class='code'><figcaption><span>Transforms each entry to string</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava7</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">barLength</span> <span class="o">=</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">;</span>
+</span><span class='line'>  <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">barTextList</span> <span class="o">=</span> <span class="n">FluentIterable</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">filteredAndSortedEntries</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">transform</span><span class="o">(</span><span class="k">new</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;,</span> <span class="n">String</span><span class="o">&gt;(){</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%&quot;</span> <span class="o">+</span> <span class="n">longestNameLength</span> <span class="o">+</span> <span class="s">&quot;s :&quot;</span><span class="o">,</span> <span class="n">input</span><span class="o">.</span><span class="na">getKey</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">,</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;*&quot;</span><span class="o">,</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">length</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">,</span> <span class="n">barLength</span> <span class="o">-</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">end</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}).</span><span class="na">toList</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>3. Joins the Strings by a line return separator and return.</h3>
+
+<p>Java 7 does not have a decent <code>String.join(...)</code> method, fortunately we get <a href="https://code.google.com/p/guava-libraries/wiki/StringsExplained#Joiner">Joiner</a> in <a href="https://code.google.com/p/guava-libraries/">Guava</a>.</p>
+
+<figure class='code'><figcaption><span>Joins string using Joiner in Guava</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromMap</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">Joiner</span><span class="o">.</span><span class="na">on</span><span class="o">(</span><span class="s">&quot;\r\n&quot;</span><span class="o">).</span><span class="na">join</span><span class="o">(</span><span class="n">barTextList</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Whole code</h3>
+
+<p>Now we can take a look of the whole code in Java 7.</p>
+
+<figure class='code'><figcaption><span>Great Java 7 solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+<span class='line-number'>62</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">Range</span> <span class="nf">getEnclosingRange</span><span class="o">(</span><span class="n">Iterable</span><span class="o">&lt;</span><span class="n">Range</span><span class="o">&gt;</span> <span class="n">ranges</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">enclosingBegin</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ordering</span><span class="o">&lt;</span><span class="n">Range</span><span class="o">&gt;(){</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Range</span> <span class="n">left</span><span class="o">,</span> <span class="n">Range</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">begin</span><span class="o">,</span> <span class="n">right</span><span class="o">.</span><span class="na">begin</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}.</span><span class="na">min</span><span class="o">(</span><span class="n">ranges</span><span class="o">).</span><span class="na">begin</span><span class="o">;</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">enclosingEnd</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ordering</span><span class="o">&lt;</span><span class="n">Range</span><span class="o">&gt;(){</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Range</span> <span class="n">left</span><span class="o">,</span> <span class="n">Range</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">end</span><span class="o">,</span> <span class="n">right</span><span class="o">.</span><span class="na">end</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}.</span><span class="na">max</span><span class="o">(</span><span class="n">ranges</span><span class="o">).</span><span class="na">end</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="k">new</span> <span class="nf">Range</span><span class="o">(</span><span class="n">enclosingBegin</span><span class="o">,</span> <span class="n">enclosingEnd</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span><span class='line'>
+</span><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartTextJava7</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">checksNotNull</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">checksArgument</span><span class="o">(!</span><span class="n">data</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">stepSize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">Range</span> <span class="n">enclosingRange</span> <span class="o">=</span> <span class="n">getEnclosingRange</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">());</span>
+</span><span class='line'>  <span class="n">List</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;</span> <span class="n">filteredAndSortedEntries</span> <span class="o">=</span> <span class="n">FluentIterable</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">entrySet</span><span class="o">())</span>
+</span><span class='line'>  <span class="o">.</span><span class="na">transform</span><span class="o">(</span><span class="k">new</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;,</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">apply</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="n">Range</span> <span class="n">range</span> <span class="o">=</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">();</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Maps</span><span class="o">.</span><span class="na">immutableEntry</span><span class="o">(</span><span class="n">input</span><span class="o">.</span><span class="na">getKey</span><span class="o">(),</span> <span class="k">new</span> <span class="n">Range</span><span class="o">(</span>
+</span><span class='line'>          <span class="o">(</span><span class="n">range</span><span class="o">.</span><span class="na">begin</span> <span class="o">-</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">begin</span><span class="o">)</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">,</span>
+</span><span class='line'>          <span class="o">(</span><span class="n">range</span><span class="o">.</span><span class="na">end</span> <span class="o">-</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">begin</span><span class="o">)</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">));</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}).</span><span class="na">filter</span><span class="o">(</span><span class="k">new</span> <span class="n">Predicate</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">boolean</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">;</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}).</span><span class="na">toSortedList</span><span class="o">(</span><span class="k">new</span> <span class="n">Comparator</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;(){</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">,</span> <span class="n">right</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">});</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">filteredAndSortedEntries</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">longestNameLength</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Ordering</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;()</span> <span class="o">{</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="kt">int</span> <span class="nf">compare</span><span class="o">(</span><span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">Range</span><span class="o">&gt;</span> <span class="n">left</span><span class="o">,</span> <span class="n">Map</span><span class="o">.</span><span class="na">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span><span class="n">Range</span><span class="o">&gt;</span> <span class="n">right</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">left</span><span class="o">.</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">(),</span> <span class="n">right</span><span class="o">.</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">());</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}.</span><span class="na">max</span><span class="o">(</span><span class="n">filteredAndSortedEntries</span><span class="o">).</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">();</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">barLength</span> <span class="o">=</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">;</span>
+</span><span class='line'>  <span class="n">List</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span> <span class="n">barTextList</span> <span class="o">=</span> <span class="n">FluentIterable</span><span class="o">.</span><span class="na">from</span><span class="o">(</span><span class="n">filteredAndSortedEntries</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">transform</span><span class="o">(</span><span class="k">new</span> <span class="n">Function</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;,</span> <span class="n">String</span><span class="o">&gt;(){</span>
+</span><span class='line'>    <span class="nd">@Override</span>
+</span><span class='line'>    <span class="kd">public</span> <span class="n">String</span> <span class="nf">apply</span><span class="o">(</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">input</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>      <span class="k">return</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%&quot;</span> <span class="o">+</span> <span class="n">longestNameLength</span> <span class="o">+</span> <span class="s">&quot;s :&quot;</span><span class="o">,</span> <span class="n">input</span><span class="o">.</span><span class="na">getKey</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">,</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;*&quot;</span><span class="o">,</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">length</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">,</span> <span class="n">barLength</span> <span class="o">-</span> <span class="n">input</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">end</span><span class="o">);</span>
+</span><span class='line'>    <span class="o">}</span>
+</span><span class='line'>  <span class="o">}).</span><span class="na">toList</span><span class="o">();</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">Joiner</span><span class="o">.</span><span class="na">on</span><span class="o">(</span><span class="s">&quot;\r\n&quot;</span><span class="o">).</span><span class="na">join</span><span class="o">(</span><span class="n">barTextList</span><span class="o">);</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I must admit it&rsquo;s freaking long(with over <strong>60</strong> lines) and unreadable(the spiky bracket hurt my eye badly &ndash;_&ndash;). Yes, I can break it into more small methods. Then there are more boilderplate code. I&rsquo;ll do the refactoring only if I get paid per line.</p>
+
+<p>We know Java 8 introduced <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a> and <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a>, let&rsquo;s see what Java 8 can do.</p>
+
+<h2>Coding in &ldquo;new&rdquo; java way</h2>
+
+<h3>1. Does some sanity check</h3>
+
+<p>No fancy tricks here, same as always.</p>
+
+<figure class='code'><figcaption><span>Sanity check</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava8</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">checkNotNull</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">checkArgument</span><span class="o">(!</span><span class="n">data</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">stepSize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>2. Transforms each record to appropriate string form</h3>
+
+<h4>2.1. Calculates how many symbols are needed for each record</h4>
+
+<h5>2.1.1. Gets the enclosing range of all ranges</h5>
+
+<p>With the help of <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a> and lambda expression, the code gets more simplified and readable.</p>
+
+<p><code>r -&gt; r.begin</code> is the shorthand form lambda in java 8(who says C# copies java?), it&rsquo;s equivalent to <code>(Range r) -&gt; { return r.begin; }</code> here, I skipped the type declaration and brackets for simplicity.</p>
+
+<p><code>Integer::compare</code> is another nice java 8 feature called <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html">Method Reference</a>. It allows you to call an existing method by name so you don&rsquo;t have to write <code>(i1, i2) -&gt; Integer.compare(r1, r2)</code> just to wrap <code>Integer.compare</code>.</p>
+
+<p>You may notice the <code>&lt;Integer&gt;</code> declaration before <code>map</code> method, it&rsquo;s pretty annoying but it&rsquo;s indispensable here since I would get a compiliation error without it. I wonder why they can&rsquo;t also do some type inference here. Weird.</p>
+
+<p>You need to call <code>get</code> method to get the value since <code>min</code> returns an <code>Optional&lt;T&gt;</code> here, I suspect they borrowed the idea from <a href="https://code.google.com/p/guava-libraries/wiki/UsingAndAvoidingNullExplained#Optional">Optional</a> in <a href="https://code.google.com/p/guava-libraries/">Guava</a>.</p>
+
+<figure class='code'><figcaption><span>Gets enclosing range using lambda and stream API</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava8</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="n">Range</span> <span class="n">enclosingRange</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Range</span><span class="o">(</span>
+</span><span class='line'>      <span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">stream</span><span class="o">().&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">begin</span><span class="o">).</span><span class="na">min</span><span class="o">(</span><span class="nl">Integer:</span><span class="o">:</span><span class="n">compare</span><span class="o">).</span><span class="na">get</span><span class="o">(),</span>
+</span><span class='line'>      <span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">stream</span><span class="o">().&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">end</span><span class="o">).</span><span class="na">max</span><span class="o">(</span><span class="nl">Integer:</span><span class="o">:</span><span class="n">compare</span><span class="o">).</span><span class="na">get</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I found a more succinct way later, it seems <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a> provides specific API for primitive types.</p>
+
+<figure class='code'><figcaption><span>Primitive type specific stream API</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava8</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="n">Range</span> <span class="n">enclosingRange</span> <span class="o">=</span> <span class="k">new</span> <span class="n">Range</span><span class="o">(</span>
+</span><span class='line'>      <span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">stream</span><span class="o">().</span><span class="na">mapToInt</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">begin</span><span class="o">).</span><span class="na">min</span><span class="o">().</span><span class="na">getAsInt</span><span class="o">(),</span>
+</span><span class='line'>      <span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">stream</span><span class="o">().</span><span class="na">mapToInt</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">end</span><span class="o">).</span><span class="na">max</span><span class="o">().</span><span class="na">getAsInt</span><span class="o">());</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h5>2.1.2. Gets transformed entries from the enclosing range and stepSize</h5>
+
+<h5>2.1.3. Filters trivial entries and sorts them by range&rsquo;s begin</h5>
+
+<p>This is almost a java 8 &ldquo;translation&rdquo; the java 7 version. Thanks to <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a>, the <em>annoynymous</em> class is no longer needed.</p>
+
+<p><code>Stream#collect(Collectors#toList())</code> here is used to transform <code>Stream&lt;T&gt;</code> to <code>List&lt;T&gt;</code>, <code>Collectors</code> is a big class provides a variety of <code>Collector</code>s, which including <code>toMap</code>, <code>toSet</code>, <code>joining</code> and other useful utilities.</p>
+
+<figure class='code'><figcaption><span>transforming, filtering and sorting</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava8</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="n">List</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;</span> <span class="n">recordList</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="na">entrySet</span><span class="o">().</span><span class="na">stream</span><span class="o">()</span>
+</span><span class='line'>      <span class="o">.&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">Maps</span><span class="o">.</span><span class="na">immutableEntry</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">(),</span>
+</span><span class='line'>        <span class="k">new</span> <span class="nf">Range</span><span class="o">((</span><span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span> <span class="o">-</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">begin</span><span class="o">)</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">,</span>
+</span><span class='line'>            <span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">end</span> <span class="o">-</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">begin</span><span class="o">)</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">)))</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">sorted</span><span class="o">((</span><span class="n">lhv</span><span class="o">,</span> <span class="n">rhv</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">lhv</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">,</span> <span class="n">rhv</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="n">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">recordList</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>2.2. Gets the length of longest name for further alignment.</h4>
+
+<p>That&rsquo;s pretty straightforward.</p>
+
+<figure class='code'><figcaption><span>Gets length of the longest name</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava8</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">longestNameLength</span> <span class="o">=</span> <span class="n">recordList</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+</span><span class='line'>      <span class="o">.&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">()).</span><span class="na">max</span><span class="o">(</span><span class="nl">Integer:</span><span class="o">:</span><span class="n">compare</span><span class="o">).</span><span class="na">get</span><span class="o">();</span>
+</span><span class='line'>  <span class="o">...</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>2.3. Gets the proper string representation of each record.</h4>
+
+<h3>3. Joins the string list by a line return separator and return.</h3>
+
+<p>Also straight forward. <code>Stream#map</code> is used to transform entries into strings.</p>
+
+<p>Since there&rsquo;re no null element, <a href="https://code.google.com/p/guava-libraries/wiki/StringsExplained#Joiner">Joiner</a> would be an overkill. A <code>Collectors.joining</code> would suffice.</p>
+
+<figure class='code'><figcaption><span>Gets string result</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava8</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="o">...</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">barLength</span> <span class="o">=</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">recordList</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+</span><span class='line'>      <span class="o">.&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%&quot;</span> <span class="o">+</span> <span class="n">longestNameLength</span> <span class="o">+</span> <span class="s">&quot;s: &quot;</span><span class="o">,</span> <span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">,</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;*&quot;</span><span class="o">,</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">length</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">,</span> <span class="n">barLength</span> <span class="o">-</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">end</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="n">Collectors</span><span class="o">.</span><span class="na">joining</span><span class="o">(</span><span class="s">&quot;\r\n&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Whole code</h3>
+
+<figure class='code'><figcaption><span>Succinct Java 8 Solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="n">String</span> <span class="nf">getBarChartFromRangesByNameJava8</span><span class="o">(</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;</span> <span class="n">data</span><span class="o">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="n">checkNotNull</span><span class="o">(</span><span class="n">data</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">checkArgument</span><span class="o">(!</span><span class="n">data</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">()</span> <span class="o">&amp;&amp;</span> <span class="n">stepSize</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="o">);</span>
+</span><span class='line'>  <span class="n">Range</span> <span class="n">enclosingRange</span> <span class="o">=</span>
+</span><span class='line'>      <span class="k">new</span> <span class="nf">Range</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">stream</span><span class="o">().&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">begin</span><span class="o">).</span><span class="na">min</span><span class="o">(</span><span class="nl">Integer:</span><span class="o">:</span><span class="n">compare</span><span class="o">).</span><span class="na">get</span><span class="o">(),</span>
+</span><span class='line'>          <span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">stream</span><span class="o">().&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">end</span><span class="o">).</span><span class="na">max</span><span class="o">(</span><span class="nl">Integer:</span><span class="o">:</span><span class="n">compare</span><span class="o">).</span><span class="na">get</span><span class="o">());</span>
+</span><span class='line'>  <span class="n">List</span><span class="o">&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;</span> <span class="n">recordList</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="na">entrySet</span><span class="o">().</span><span class="na">stream</span><span class="o">()</span>
+</span><span class='line'>      <span class="o">.&lt;</span><span class="n">Entry</span><span class="o">&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Range</span><span class="o">&gt;&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">Maps</span><span class="o">.</span><span class="na">immutableEntry</span><span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">(),</span>
+</span><span class='line'>        <span class="k">new</span> <span class="nf">Range</span><span class="o">((</span><span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span> <span class="o">-</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">begin</span><span class="o">)</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">,</span>
+</span><span class='line'>            <span class="o">(</span><span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">end</span> <span class="o">-</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">begin</span><span class="o">)</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">)))</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">filter</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">length</span><span class="o">()</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="o">)</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">sorted</span><span class="o">((</span><span class="n">lhv</span><span class="o">,</span> <span class="n">rhv</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">Integer</span><span class="o">.</span><span class="na">compare</span><span class="o">(</span><span class="n">lhv</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">,</span> <span class="n">rhv</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="n">Collectors</span><span class="o">.</span><span class="na">toList</span><span class="o">());</span>
+</span><span class='line'>  <span class="k">if</span> <span class="o">(</span><span class="n">recordList</span><span class="o">.</span><span class="na">isEmpty</span><span class="o">())</span> <span class="o">{</span>
+</span><span class='line'>    <span class="k">return</span> <span class="s">&quot;&quot;</span><span class="o">;</span>
+</span><span class='line'>  <span class="o">}</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">longestNameLength</span> <span class="o">=</span> <span class="n">recordList</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+</span><span class='line'>      <span class="o">.&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">()).</span><span class="na">max</span><span class="o">(</span><span class="nl">Integer:</span><span class="o">:</span><span class="n">compare</span><span class="o">).</span><span class="na">get</span><span class="o">();</span>
+</span><span class='line'>  <span class="kt">int</span> <span class="n">barLength</span> <span class="o">=</span> <span class="n">enclosingRange</span><span class="o">.</span><span class="na">length</span><span class="o">()</span> <span class="o">/</span> <span class="n">stepSize</span><span class="o">;</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">recordList</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+</span><span class='line'>      <span class="o">.&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">String</span><span class="o">.</span><span class="na">format</span><span class="o">(</span><span class="s">&quot;%&quot;</span> <span class="o">+</span> <span class="n">longestNameLength</span> <span class="o">+</span> <span class="s">&quot;s: &quot;</span><span class="o">,</span> <span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">,</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">begin</span><span class="o">)</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;*&quot;</span><span class="o">,</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">length</span><span class="o">())</span>
+</span><span class='line'>          <span class="o">+</span> <span class="n">Strings</span><span class="o">.</span><span class="na">repeat</span><span class="o">(</span><span class="s">&quot;-&quot;</span><span class="o">,</span> <span class="n">barLength</span> <span class="o">-</span> <span class="n">entry</span><span class="o">.</span><span class="na">getValue</span><span class="o">().</span><span class="na">end</span><span class="o">))</span>
+</span><span class='line'>      <span class="o">.</span><span class="na">collect</span><span class="o">(</span><span class="n">Collectors</span><span class="o">.</span><span class="na">joining</span><span class="o">(</span><span class="s">&quot;\r\n&quot;</span><span class="o">));</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Java 8 simpilfies this task greatly by the help of <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a> and <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a>. The code lines count drops significantly from over 60 lines to 26 lines by the elimination of <em>annoynymous</em> classes.</p>
+
+<p>I have to admit Java 8 made considerable progress over Java 7. But it <strong>COULD</strong> be even better. Let&rsquo;s see how C# tackle this.</p>
+
+<h2>What about C#?</h2>
+
+<h3>1. Does some sanity check</h3>
+
+<p>Raise an <code>ArgumentException</code> if something went crazy.</p>
+
+<figure class='code'><figcaption><span>Sanity check</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='c#'><span class='line'><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">GenerateBarChartText</span><span class="p">(</span><span class="n">Dictionary</span><span class="p">&lt;</span><span class="n">String</span><span class="p">,</span> <span class="n">Range</span><span class="p">&gt;</span> <span class="n">data</span><span class="p">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">data</span> <span class="p">==</span> <span class="k">null</span> <span class="p">||</span> <span class="n">data</span><span class="p">.</span><span class="n">Count</span> <span class="p">==</span> <span class="m">0</span> <span class="p">||</span> <span class="n">stepSize</span> <span class="p">&lt;=</span> <span class="m">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentException</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>2. Transforms each Entry to appropriate String form</h3>
+
+<h4>2.1. Calculates how many symbols are needed for each Entry</h4>
+
+<h5>2.1.1. Gets the enclosing Range of all ranges</h5>
+
+<p>With the help of <a href="http://msdn.microsoft.com/en-us/library/x9fsa0sw.aspx">Property Syntax</a> and <a href="http://msdn.microsoft.com/en-us/library/bb397926.aspx">LINQ</a>. One line would suffice.</p>
+
+<figure class='code'><figcaption><span>Gets enclosing range in one line</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c#'><span class='line'><span class="n">Range</span> <span class="n">enclosingRange</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Range</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">Values</span><span class="p">.</span><span class="n">Min</span><span class="p">(</span><span class="n">r</span> <span class="p">=&gt;</span> <span class="n">r</span><span class="p">.</span><span class="n">Begin</span><span class="p">),</span> <span class="n">data</span><span class="p">.</span><span class="n">Values</span><span class="p">.</span><span class="n">Max</span><span class="p">(</span><span class="n">r</span> <span class="p">=&gt;</span> <span class="n">r</span><span class="p">.</span><span class="n">End</span><span class="p">));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which is much more succinct than the Java 8 version:</p>
+
+<figure class='code'><figcaption><span>Not so succinct Java 8</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Range</span> <span class="n">enclosingRange</span> <span class="o">=</span>
+</span><span class='line'>    <span class="k">new</span> <span class="nf">Range</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">stream</span><span class="o">().</span><span class="na">mapToInt</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">begin</span><span class="o">).</span><span class="na">min</span><span class="o">().</span><span class="na">getAsInt</span><span class="o">(),</span>
+</span><span class='line'>        <span class="n">data</span><span class="o">.</span><span class="na">values</span><span class="o">().</span><span class="na">stream</span><span class="o">().</span><span class="na">mapToInt</span><span class="o">(</span><span class="n">r</span> <span class="o">-&gt;</span> <span class="n">r</span><span class="o">.</span><span class="na">end</span><span class="o">).</span><span class="na">max</span><span class="o">().</span><span class="na">getAsInt</span><span class="o">());</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I am very <a name="surprised">surprised</a> that there is not a <code>Max(selector)</code> equivalence in Java 8(e.g. <code>Stream#max(Function&lt;T, ? extends Comparable&gt;)</code>), which means you can only write <code>stream.&lt;Integer&gt;map(obj -&gt; obj.intValue).max(Integer::compare)</code> in Java 8 instead of the much more succint <code>stream.max(obj -&gt; obj.intValue)</code>, again, weird.</p>
+
+<p>It&rsquo;s not hard to write a Java 8 version of <code>Max(selector)</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kd">public</span> <span class="kd">static</span> <span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">R</span> <span class="kd">extends</span> <span class="n">Comparable</span><span class="o">&lt;?</span> <span class="kd">super</span> <span class="n">R</span><span class="o">&gt;&gt;</span> <span class="n">Optional</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">maxBySelector</span><span class="o">(</span><span class="n">Stream</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span> <span class="n">stream</span><span class="o">,</span>
+</span><span class='line'>    <span class="n">Function</span><span class="o">&lt;</span><span class="n">T</span><span class="o">,</span> <span class="n">R</span><span class="o">&gt;</span> <span class="n">selector</span><span class="o">)</span> <span class="o">{</span>
+</span><span class='line'>  <span class="k">return</span> <span class="n">stream</span><span class="o">.</span><span class="na">max</span><span class="o">((</span><span class="n">t1</span><span class="o">,</span> <span class="n">t2</span><span class="o">)</span> <span class="o">-&gt;</span> <span class="n">selector</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">t1</span><span class="o">).</span><span class="na">compareTo</span><span class="o">(</span><span class="n">selector</span><span class="o">.</span><span class="na">apply</span><span class="o">(</span><span class="n">t2</span><span class="o">)));</span>
+</span><span class='line'><span class="o">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then test it with a selector <code>s -&gt; s.length()</code>:</p>
+
+<figure class='code'><figcaption><span>test failure</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">maxBySelector</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">keySet</span><span class="o">().</span><span class="na">stream</span><span class="o">(),</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">()));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Then something more weird happens: A compiler error! It seems eclipse does not handle lambdas well at this moment.</p>
+
+<figure class='code'><figcaption><span>compiler failure</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">Internal</span> <span class="n">compiler</span> <span class="nl">error:</span> <span class="n">java</span><span class="o">.</span><span class="na">lang</span><span class="o">.</span><span class="na">NullPointerException</span> <span class="n">at</span> <span class="n">org</span><span class="o">.</span><span class="na">eclipse</span><span class="o">.</span><span class="na">jdt</span><span class="o">.</span><span class="na">internal</span><span class="o">.</span><span class="na">compiler</span><span class="o">.</span><span class="na">ast</span><span class="o">.</span><span class="na">LambdaExpression</span><span class="o">.</span><span class="na">analyseCode</span><span class="o">(</span><span class="n">LambdaExpression</span><span class="o">.</span><span class="na">java</span><span class="o">:</span><span class="mi">395</span><span class="o">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I made type parameter explicit but it still not compile.</p>
+
+<figure class='code'><figcaption><span>eclipse failure</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Integer</span><span class="o">&gt;</span><span class="n">maxBySelector</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">keySet</span><span class="o">().</span><span class="na">stream</span><span class="o">(),</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">()));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Finally it worked after I added class name.</p>
+
+<figure class='code'><figcaption><span>readability failure</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="n">System</span><span class="o">.</span><span class="na">out</span><span class="o">.</span><span class="na">println</span><span class="o">(</span><span class="n">Sample</span><span class="o">.&lt;</span><span class="n">String</span><span class="o">,</span> <span class="n">Integer</span><span class="o">&gt;</span><span class="n">maxBySelector</span><span class="o">(</span><span class="n">data</span><span class="o">.</span><span class="na">keySet</span><span class="o">().</span><span class="na">stream</span><span class="o">(),</span> <span class="n">s</span> <span class="o">-&gt;</span> <span class="n">s</span><span class="o">.</span><span class="na">length</span><span class="o">()));</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>And it looks a mess. I suspect they don&rsquo;t provide a <code>Max(selector)</code> just because some compiler did not support it, damn.</p>
+
+<h5>2.1.2. Gets transformed records from the enclosing range and stepSize</h5>
+
+<h5>2.1.3. Filters trivial records and sorts them by range&rsquo;s begin value</h5>
+
+<p>I don&rsquo;t like <code>KeyValuePair&lt;T&gt;</code> here since there&rsquo;s no meaning on <code>Key</code> and <code>Value</code>, <a href="http://msdn.microsoft.com/en-us/library/bb397696.aspx">Anonymous Type</a> and <a href="http://msdn.microsoft.com/en-us/library/bb383973.aspx">Implicit Type</a> in C# provide a handy way to create instances of a temporary type. And code becomes more readable than Java 8 version(Which gets numerous spiky brackets).</p>
+
+<figure class='code'><figcaption><span>Transforming, filtering and sorting</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+</pre></td><td class='code'><pre><code class='c#'><span class='line'><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">GenerateBarChartText</span><span class="p">(</span><span class="n">Dictionary</span><span class="p">&lt;</span><span class="n">String</span><span class="p">,</span> <span class="n">Range</span><span class="p">&gt;</span> <span class="n">data</span><span class="p">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="kt">var</span> <span class="n">records</span> <span class="p">=</span> <span class="n">data</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">p</span> <span class="p">=&gt;</span> <span class="k">new</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">Name</span> <span class="p">=</span> <span class="n">p</span><span class="p">.</span><span class="n">Key</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">Range</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Range</span><span class="p">((</span><span class="n">p</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">Begin</span> <span class="p">-</span> <span class="n">enclosingRange</span><span class="p">.</span><span class="n">Begin</span><span class="p">)</span> <span class="p">/</span> <span class="n">stepSize</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">End</span> <span class="p">-</span> <span class="n">enclosingRange</span><span class="p">.</span><span class="n">Begin</span><span class="p">)</span> <span class="p">/</span> <span class="n">stepSize</span><span class="p">),</span>
+</span><span class='line'>    <span class="p">}).</span><span class="n">Where</span><span class="p">(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Length</span> <span class="p">&gt;</span> <span class="m">0</span><span class="p">).</span><span class="n">OrderBy</span><span class="p">(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Length</span><span class="p">).</span><span class="n">ToList</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">records</span><span class="p">.</span><span class="n">Count</span> <span class="p">==</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="p">....</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Again, an <code>OrderBy(selector)</code> is missing in Java 8, although Java 8 provides a parameterless natural  <code>Stream#sorted()</code>, but <code>stream.&lt;Integer&gt;map(r -&gt; r.intValue).sorted()</code> is still messier than <code>stream.sorted(r -&gt; r.intValue)</code>. Maybe they will say it&rsquo;s for performance &ndash;_&ndash;</p>
+
+<h4>2.2. Gets the length of longest name for further alignment.</h4>
+
+<figure class='code'><figcaption><span>Gets length of the longest name</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='c#'><span class='line'><span class="kt">int</span> <span class="n">longestNameLength</span> <span class="p">=</span> <span class="n">records</span><span class="p">.</span><span class="n">Max</span><span class="p">(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">s</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">Length</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Which is far more succint than the Java 8 version:</p>
+
+<figure class='code'><figcaption><span>Not so succinct Java 8</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='java'><span class='line'><span class="kt">int</span> <span class="n">longestNameLength</span> <span class="o">=</span> <span class="n">recordList</span><span class="o">.</span><span class="na">stream</span><span class="o">()</span>
+</span><span class='line'>    <span class="o">.&lt;</span><span class="n">Integer</span><span class="o">&gt;</span><span class="n">map</span><span class="o">(</span><span class="n">entry</span> <span class="o">-&gt;</span> <span class="n">entry</span><span class="o">.</span><span class="na">getKey</span><span class="o">().</span><span class="na">length</span><span class="o">()).</span><span class="na">max</span><span class="o">(</span><span class="nl">Integer:</span><span class="o">:</span><span class="n">compare</span><span class="o">).</span><span class="na">get</span><span class="o">();</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>2.3. Gets the proper string representation of each record.</h4>
+
+<h3>3. Joins the string list by a line return separator and return.</h3>
+
+<p>Almost identical to the Java 8 version.</p>
+
+<figure class='code'><figcaption><span>Gets string result</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='c#'><span class='line'><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">GenerateBarChartText</span><span class="p">(</span><span class="n">Dictionary</span><span class="p">&lt;</span><span class="n">String</span><span class="p">,</span> <span class="n">Range</span><span class="p">&gt;</span> <span class="n">data</span><span class="p">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="p">...</span>
+</span><span class='line'>    <span class="k">return</span> <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="s">&quot;\r\n&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">records</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="kt">string</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span><span class="s">&quot;{0,&quot;</span> <span class="p">+</span> <span class="n">longestNameLength</span> <span class="p">+</span> <span class="s">&quot;}: &quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">.</span><span class="n">Name</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">+</span> <span class="k">new</span> <span class="n">String</span><span class="p">(</span><span class="sc">&#39;-&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Begin</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">+</span> <span class="k">new</span> <span class="n">String</span><span class="p">(</span><span class="sc">&#39;*&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Length</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">+</span> <span class="k">new</span> <span class="n">String</span><span class="p">(</span><span class="sc">&#39;-&#39;</span><span class="p">,</span> <span class="n">totalCount</span> <span class="p">-</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Length</span><span class="p">)));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h3>Whole code</h3>
+
+<figure class='code'><figcaption><span>Even more better C# solution</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='c#'><span class='line'><span class="k">public</span> <span class="k">static</span> <span class="kt">string</span> <span class="nf">GenerateBarChartText</span><span class="p">(</span><span class="n">Dictionary</span><span class="p">&lt;</span><span class="n">String</span><span class="p">,</span> <span class="n">Range</span><span class="p">&gt;</span> <span class="n">data</span><span class="p">,</span> <span class="kt">int</span> <span class="n">stepSize</span><span class="p">)</span>
+</span><span class='line'><span class="p">{</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">data</span> <span class="p">==</span> <span class="k">null</span> <span class="p">||</span> <span class="n">data</span><span class="p">.</span><span class="n">Count</span> <span class="p">==</span> <span class="m">0</span> <span class="p">||</span> <span class="n">stepSize</span> <span class="p">&lt;=</span> <span class="m">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="k">throw</span> <span class="k">new</span> <span class="nf">ArgumentException</span><span class="p">();</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="n">Range</span> <span class="n">enclosingRange</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Range</span><span class="p">(</span><span class="n">data</span><span class="p">.</span><span class="n">Values</span><span class="p">.</span><span class="n">Min</span><span class="p">(</span><span class="n">r</span> <span class="p">=&gt;</span> <span class="n">r</span><span class="p">.</span><span class="n">Begin</span><span class="p">),</span> <span class="n">data</span><span class="p">.</span><span class="n">Values</span><span class="p">.</span><span class="n">Max</span><span class="p">(</span><span class="n">r</span> <span class="p">=&gt;</span> <span class="n">r</span><span class="p">.</span><span class="n">End</span><span class="p">));</span>
+</span><span class='line'>    <span class="kt">var</span> <span class="n">records</span> <span class="p">=</span> <span class="n">data</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">p</span> <span class="p">=&gt;</span> <span class="k">new</span>
+</span><span class='line'>    <span class="p">{</span>
+</span><span class='line'>        <span class="n">Name</span> <span class="p">=</span> <span class="n">p</span><span class="p">.</span><span class="n">Key</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">Range</span> <span class="p">=</span> <span class="k">new</span> <span class="n">Range</span><span class="p">((</span><span class="n">p</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">Begin</span> <span class="p">-</span> <span class="n">enclosingRange</span><span class="p">.</span><span class="n">Begin</span><span class="p">)</span> <span class="p">/</span> <span class="n">stepSize</span><span class="p">,</span>
+</span><span class='line'>            <span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">Value</span><span class="p">.</span><span class="n">End</span> <span class="p">-</span> <span class="n">enclosingRange</span><span class="p">.</span><span class="n">Begin</span><span class="p">)</span> <span class="p">/</span> <span class="n">stepSize</span><span class="p">),</span>
+</span><span class='line'>    <span class="p">}).</span><span class="n">Where</span><span class="p">(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Length</span> <span class="p">&gt;</span> <span class="m">0</span><span class="p">).</span><span class="n">OrderBy</span><span class="p">(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Length</span><span class="p">).</span><span class="n">ToList</span><span class="p">();</span>
+</span><span class='line'>    <span class="k">if</span> <span class="p">(</span><span class="n">records</span><span class="p">.</span><span class="n">Count</span> <span class="p">==</span> <span class="m">0</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>        <span class="k">return</span> <span class="kt">string</span><span class="p">.</span><span class="n">Empty</span><span class="p">;</span>
+</span><span class='line'>    <span class="p">}</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">longestNameLength</span> <span class="p">=</span> <span class="n">records</span><span class="p">.</span><span class="n">Max</span><span class="p">(</span><span class="n">s</span> <span class="p">=&gt;</span> <span class="n">s</span><span class="p">.</span><span class="n">Name</span><span class="p">.</span><span class="n">Length</span><span class="p">);</span>
+</span><span class='line'>    <span class="kt">int</span> <span class="n">totalCount</span> <span class="p">=</span> <span class="n">enclosingRange</span><span class="p">.</span><span class="n">Length</span> <span class="p">/</span> <span class="n">stepSize</span><span class="p">;</span>
+</span><span class='line'>    <span class="k">return</span> <span class="kt">string</span><span class="p">.</span><span class="n">Join</span><span class="p">(</span><span class="s">&quot;\r\n&quot;</span><span class="p">,</span>
+</span><span class='line'>        <span class="n">records</span><span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">i</span> <span class="p">=&gt;</span> <span class="kt">string</span><span class="p">.</span><span class="n">Format</span><span class="p">(</span><span class="s">&quot;{0,&quot;</span> <span class="p">+</span> <span class="n">longestNameLength</span> <span class="p">+</span> <span class="s">&quot;}: &quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">.</span><span class="n">Name</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">+</span> <span class="k">new</span> <span class="n">String</span><span class="p">(</span><span class="sc">&#39;-&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Begin</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">+</span> <span class="k">new</span> <span class="n">String</span><span class="p">(</span><span class="sc">&#39;*&#39;</span><span class="p">,</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Length</span><span class="p">)</span>
+</span><span class='line'>            <span class="p">+</span> <span class="k">new</span> <span class="n">String</span><span class="p">(</span><span class="sc">&#39;-&#39;</span><span class="p">,</span> <span class="n">totalCount</span> <span class="p">-</span> <span class="n">i</span><span class="p">.</span><span class="n">Range</span><span class="p">.</span><span class="n">Length</span><span class="p">)));</span>
+</span><span class='line'><span class="p">}</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You can find lots of similarities between Java 8 and C# 4, but C# code looks more readable, since C# has a more dedicated type inference mechanism(which eliminates almost all explicit type parameters) and a more succinct API.</p>
+
+<p>They have more brilliant language designers and compiler designers.</p>
+
+<h2>Conclusions</h2>
+
+<p><strong>DISCLAIMER</strong>: Following conclusions are only based on the case in this article.</p>
+
+<h3>Java 7</h3>
+
+<p>Totally a mess and outdated, a typical <strong>write more do less</strong> programming language. It <em>supports</em> functional programming <strong>ACCIDENTALLY</strong> by a shitty verbose <em>annoynymous</em> class, which would make things even more complicated.</p>
+
+<p>In my perspective:</p>
+
+<blockquote><p>Programming in plain Java 7 is like you are talking to a half <strong>deaf also dumb</strong> ass that you have to shout every words in three times, then you begin to feel if you are dumb too.</p></blockquote>
+
+<h3>Java 8</h3>
+
+<p>A big leap since Java 7, the introduction of <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a> releases old java users from the shitty verbose <em>annoynymous</em> class syntax, and <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a> makes collection operations easiser.</p>
+
+<p>However, Java 8 is still far away from usability:</p>
+
+<ul>
+<li>Java 8 might not deaf but still dumb, you still have to say everything twice. It has type inference, but only work in limited case so code like <code>Map&lt;String, String&gt; map = Maps.&lt;String,String&gt;builder().put(x).build()</code> and <code>stream.&lt;String&gt;map(i -&gt; Integer.toString(i))</code> is still avoidable.</li>
+<li>The <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a> is still verbose and confusing
+
+<ul>
+<li>It did not have any <code>minBy(selector)</code> or <code>toSortedBy(selector)</code>, and you can hardly implement one yourself(<a href="#surprised">Surprising</a>).</li>
+<li>Stream is <strong>NOT</strong> stateless, you can <strong>NOT</strong> reuse a stream which had been applied a teminate operation(e.g. <code>stream.count()</code> would fail after you called <code>stream.max()</code>), maybe that has a performance gain, but it looks weird.</li>
+<li>You have to call <code>get</code> on every reducing operation since they returns a <code>Optional&lt;T&gt;</code>, which makes code more verbose.(That might be nit, but I think a <code>maxOrDefault</code> is better in this case)</li>
+<li>It uses a <code>Collector</code> to make <code>Stream</code> into other type like <code>String</code>, <code>List</code> and <code>Map</code>, which produces very weird API: You have to use <code>stream.collect(Collectors.toList())</code> instead of <code>stream.toList()</code>, <code>stream.collect(Collectors.joining("\n"))</code> instead of <code>stream.joining("\n")</code></li>
+</ul>
+</li>
+<li>Very limited compiler support, my Eclipse often hangs or pops up an alert window when writing lambdas in stream API. Also code suggestion works badly in lambda expressions.</li>
+</ul>
+
+
+<p>Which draws a frustrating conclusion:</p>
+
+<blockquote><p>It took these java designers over 5 years effort to make something that can not even beat a 5-years-ago C# 3 on collection operations.</p></blockquote>
+
+<h3>C# 4</h3>
+
+<p>In this case, C# 4 is the undisputed winner. Powered by <a href="http://msdn.microsoft.com/en-us/library/bb397926.aspx">LINQ</a>, <a href="http://msdn.microsoft.com/en-us/library/bb397696.aspx">Anonymous Type</a> and <a href="http://msdn.microsoft.com/en-us/library/x9fsa0sw.aspx">Property Syntax</a>, C# allows you to finish the task fluently and produce more readable code. Since I did not touch any C# 4 features, so this conclusion also works in C# 3.</p>
+
+<p>But</p>
+
+<blockquote><p>the awful fact is I may have to use java 7 for many years, sometimes I hope I never learnt other languages, so I could feel like I&rsquo;m using the best programming languages now. &ndash;_&ndash;</p></blockquote>
+
+<h2>References</h2>
+
+<ol>
+<li>Lambda expressions in Java 8 Tutorials: <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html</a></li>
+<li>Java 8 Stream API: <a href="http://www.slideshare.net/BjrnKimminich/java-8-streams">http://www.slideshare.net/BjrnKimminich/java-8-streams</a></li>
+<li>guava-libraries: <a href="https://code.google.com/p/guava-libraries/wiki/GuavaExplained">https://code.google.com/p/guava-libraries/wiki/GuavaExplained</a></li>
+</ol>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[First Article]]></title>

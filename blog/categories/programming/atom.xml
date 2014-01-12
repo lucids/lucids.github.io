@@ -1,0 +1,840 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Programming | Lucids]]></title>
+  <link href="http://lucids.github.io/blog/categories/programming/atom.xml" rel="self"/>
+  <link href="http://lucids.github.io/"/>
+  <updated>2014-01-12T18:28:31+00:00</updated>
+  <id>http://lucids.github.io/</id>
+  <author>
+    <name><![CDATA[Lucids]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[A Taste of Functional Programming in Java 7, Java 8 and C# 4]]></title>
+    <link href="http://lucids.github.io/blog/a-taste-of-functional-programming-in-java-7/"/>
+    <updated>2014-01-12T18:08:02+00:00</updated>
+    <id>http://lucids.github.io/blog/a-taste-of-functional-programming-in-java-7</id>
+    <content type="html"><![CDATA[<h2>Keywords</h2>
+
+<p><strong>Java</strong>, <strong>C#, Java 8</strong>, <strong>Functional Programming</strong>, <strong><a href="https://code.google.com/p/guava-libraries/">Guava</a></strong></p>
+
+<h2>Abstract</h2>
+
+<p>By introducing a real-world problem, this article shows how Java 7 failed to solve it elegantly, how Java 8 make it better by the help of <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a> and <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a>, and how C# 4 make it even better with the power of <a href="http://msdn.microsoft.com/en-us/library/bb397696.aspx">Anonymous Type</a> and <a href="http://msdn.microsoft.com/en-us/library/bb397926.aspx">LINQ</a>.</p>
+
+<h2>Problem</h2>
+
+<h3>Definition</h3>
+
+<p>We&rsquo;ve got some timing records from our log. These records are stored in a <code>Map&lt;String, Range&gt;</code>. Now we need to visualize them.</p>
+
+<p><code>Range</code> is a closed-open range.</p>
+
+<p>```java Definition of class Range
+public class Range {
+  public final int begin;
+  public final int end;</p>
+
+<p>  public Range(int begin, int end) {</p>
+
+<pre><code>this.begin = begin;
+this.end = end;
+</code></pre>
+
+<p>  }</p>
+
+<p>  public int length() {</p>
+
+<pre><code>return end - begin;
+</code></pre>
+
+<p>  }
+}
+```</p>
+
+<p><code>java interface of this function
+public static String getBarChartFromRangesByName(Map&lt;String, Range&gt; data, int stepSize);
+</code></p>
+
+<h3>Example input</h3>
+
+<p><code>js example input
+data = {
+  'Action1' : Range(0, 10),
+  'Act2' : Range(10, 30),
+  'Action3' : Range(20, 50),
+  'Trivial' : Range(0, 5),
+},
+stepSize = 10;
+</code></p>
+
+<h3>Expected output</h3>
+
+<p><code>java expected output
+Action1: *----
+   Act2: -**--
+Action3: --***
+</code></p>
+
+<p><strong>NOTE</strong>: This example input will be used in the whole article.</p>
+
+<h3>Requirements</h3>
+
+<ol>
+<li>Records in the output should keep an ascending order by its range begin value.</li>
+<li><code>stepSize</code> is given to transform record range to chart range.</li>
+<li>The <strong>n</strong>th symbol represents <code>Range(n * stepSize, (n + 1) * stepSize - 1)</code>.</li>
+<li><code>-</code> represents idle, <code>*</code> represents busy. e.g. <code>Range(10, 30)</code> in the enclosing <code>Range(0, 50)</code> should be <code>-**--</code></li>
+</ol>
+
+
+<h3>Caveats</h3>
+
+<ol>
+<li>Trivial input(which can not make one step) should be removed.</li>
+<li>Alignment is needed, as you see, <strong>Act2</strong> is right aligned with other record names.</li>
+<li>Return an empty string if input is empty, or if all records are trivial.</li>
+</ol>
+
+
+<h2>How to solve it</h2>
+
+<p>This article focuses on language features instead of algorithm design or problem analysis, so I won&rsquo;t go any further than listing steps below:</p>
+
+<ol>
+<li>Does some sanity check.</li>
+<li>Transforms each record from data to appropriate string form like <code>Action1: -**--</code>.</li>
+<li> Calculates how many symbols are needed for each entry
+
+<ol>
+<li>Gets the enclosing <code>Range</code> of all ranges</li>
+<li>Transforms each record range(<code>Range(10, 30)</code>) into the actual range(<code>Range(1, 3)</code>) in the <code>String</code> form(<code>-**--</code>) from the enclosing range(<code>Range(0, 50)</code>) and stepSize(<code>10</code>).</li>
+</ol>
+</li>
+<li> Gets the length of longest name of all records for further alignment.</li>
+<li> Gets the proper string representation of each record.</li>
+<li>Joins the string list by a line return separator and return.</li>
+</ol>
+
+
+<h2>Coding in &ldquo;old&rdquo; java way</h2>
+
+<p>Firstly I&rsquo;ll implement the solution in Java 7 with the help of <a href="https://code.google.com/p/guava-libraries/">Guava</a>, the de facto java library of Google.</p>
+
+<h3>1. Does some sanity check</h3>
+
+<p><a href="https://code.google.com/p/guava-libraries/">Guava</a> provides some neat checks in <code>com.google.common.base.Preconditions.*</code>:</p>
+
+<p><code>java Sanity check using Preconditions in Guava
+import static com.google.common.base.Preconditions.checksNotNull;
+import static com.google.common.base.Preconditions.checksArgument;
+...
+public static String getBarChartFromRangesByNameJava7(Map&lt;String, Range&gt; data, int stepSize) {
+  checkNotNull(data);
+  checkArgument(!data.isEmpty() &amp;&amp; stepSize &gt; 0);
+...
+</code></p>
+
+<h3>2. Transforms each record to appropriate string form</h3>
+
+<h4>2.1. Calculates how many symbols are needed for each record</h4>
+
+<h5>2.1.1. Gets the enclosing range of all ranges</h5>
+
+<p>Calculating the enclosing <code>Range</code> is straightforward: Foreach the <code>Range</code> in  <code>Map&lt;String, Range&gt;</code> then take the minimum <code>begin</code> as enclosing begin and the maximum <code>end</code> as enclosing end.</p>
+
+<p>```java Gets enclosing range in an imperative style
+public static Range getEnclosingRange(Iterable<Range> ranges) {
+  int enclosingBegin = Integer.MAX_VALUE;
+  int enclosingEnd = Integer.MIN_VALUE;
+  for (Range range : ranges) {</p>
+
+<pre><code>if (range.begin &lt; enclosingBegin) {
+  enclosingBegin = range.begin;
+}
+if (range.end &gt; enclosingEnd) {
+  enclosingEnd = range.end;
+}
+</code></pre>
+
+<p>  }
+  return new Range(enclosingBegin, enclosingEnd);
+}
+```</p>
+
+<p>Although <a href="https://code.google.com/p/guava-libraries/">Guava</a> has a <a href="https://code.google.com/p/guava-libraries/wiki/OrderingExplained">Ordering</a> which can handle the min/max operation in a declarative way, but it won&rsquo;t simplify the code here:</p>
+
+<p>```java Gets enclosing range in a declarative style
+public static Range getEnclosingRange(Iterable<Range> ranges) {
+  int enclosingBegin = new Ordering<Range>(){</p>
+
+<pre><code>@Override
+public int compare(Range left, Range right) {
+  return Integer.compare(left.begin, right.begin);
+}
+</code></pre>
+
+<p>  }.max(ranges).begin;
+  int enclosingEnd = new Ordering<Range>(){</p>
+
+<pre><code>@Override
+public int compare(Range left, Range right) {
+  return Integer.compare(left.end, right.end);
+}
+</code></pre>
+
+<p>  }.max(ranges).end;
+  return new Range(enclosingBegin, enclosingEnd);
+}
+```
+Actually it&rsquo;s even 2 lines more than the imperative style! But it is really not <a href="https://code.google.com/p/guava-libraries/">Guava</a>&rsquo;s fault. Java 7&rsquo;s verbose <em>annoynymous</em> class syntax made the should-be-clear code a mess.</p>
+
+<p>I decided to use a consistent declarative style here, so I will keep the one with <a href="https://code.google.com/p/guava-libraries/wiki/OrderingExplained">Ordering</a>.</p>
+
+<h5>2.1.2. Gets transformed entries from the enclosing range and stepSize</h5>
+
+<h5>2.1.3. Filters trivial entries and sorts them by range&rsquo;s begin</h5>
+
+<p><a href="https://code.google.com/p/guava-libraries/">Guava</a> provides <a href="https://code.google.com/p/guava-libraries/wiki/FunctionalExplained">FluentIterable</a> for processing collection in a &ldquo;fluent&rdquo; interface, so I combined the transforming, filtering and sorting together.</p>
+
+<p>Firstly I used <code>FluentIterable#transform</code> to transform entries to the &ldquo;representing form&rdquo;(e.g. <code>Range(10,30)</code> with a enclosing <code>Range(0,50)</code> and stepSize <code>10</code> will be transformed into <code>Range(1,3)</code>, which matches its string form <code>-**--</code>)</p>
+
+<p>```java transform entries
+public static String getBarChartFromRangesByNameJava7(Map&lt;String, Range> data, int stepSize) {
+  &hellip;
+  Range enclosingRange = getEnclosingRange(data.values());
+  int totalLength = enclosingRange.length();
+  List&lt;Entry&lt;String, Range>> filteredAndSortedEntries = FluentIterable.from(data.entrySet())</p>
+
+<pre><code>.transform(new Function&lt;Entry&lt;String, Range&gt;, Entry&lt;String, Range&gt;&gt;() {
+  @Override
+  public Entry&lt;String, Range&gt; apply(Entry&lt;String, Range&gt; input) {
+    Range range = input.getValue();
+    return Maps.immutableEntry(input.getKey(), new Range(
+        (range.begin - enclosingRange.begin) / enclosingRange.length(),
+        (range.end - enclosingRange.end) / enclosingRange.length()));
+  }
+})
+</code></pre>
+
+<p>  &hellip;
+```</p>
+
+<p>Then I used <code>FluentIterable#filter</code> to filter out trivial entries(<code>length &lt; 1</code>).</p>
+
+<p>```java only keep non-trivial entries
+  &hellip;
+  .filter(new Predicate&lt;Entry&lt;String, Range>>() {</p>
+
+<pre><code>@Override
+public boolean apply(Entry&lt;String, Range&gt; input) {
+  return input.getValue().length() &gt; 0;
+}
+</code></pre>
+
+<p>  })
+  &hellip;
+```</p>
+
+<p>Finally <code>FluentIterable#toSortedList</code> is used to get a sorted entry list, a custom <code>Comparator</code> is provided here to sort entries by range&rsquo;s begin value.</p>
+
+<p>```java sort entries by Range#begin
+  &hellip;
+  .toSortedList(new Comparator&lt;Entry&lt;String, Range>>(){</p>
+
+<pre><code>@Override
+public int compare(Entry&lt;String, Range&gt; left, Entry&lt;String, Range&gt; right) {
+  return Integer.compare(left.getValue().begin, right.getValue().begin);
+}
+</code></pre>
+
+<p>  });
+  &hellip;
+```</p>
+
+<p>Since the enty list might be empty after filtering, I added a early return here. It also prevents Exception from possible <code>Ordering#max</code> invoking.</p>
+
+<p>```java
+  &hellip;
+  if (filteredAndSortedEntries.isEmpty()) {</p>
+
+<pre><code>return "";
+</code></pre>
+
+<p>  }
+  &hellip;
+```</p>
+
+<h4>2.2. Gets the length of longest name for further alignment.</h4>
+
+<p>Before getting the string list, we need to get the longest name&rsquo;s length so we can make a <strong>right</strong> alignment.</p>
+
+<p><a href="https://code.google.com/p/guava-libraries/wiki/OrderingExplained">Ordering</a> was used to get the longest length, it should be noticed that <code>Ordering#max</code> would throw an Exception if input interables are empty.</p>
+
+<p>```java Gets length of the longest name
+public static String getBarChartFromRangesByNameJava7(Map&lt;String, Range> data, int stepSize) {
+  &hellip;
+  int longestNameLength = new Ordering&lt;Entry&lt;String, Range>>() {</p>
+
+<pre><code>@Override
+public int compare(Map.Entry&lt;String,Range&gt; left, Map.Entry&lt;String,Range&gt; right) {
+  return Integer.compare(left.getKey().length(), right.getKey().length());
+}
+</code></pre>
+
+<p>  }.max(filteredAndSortedEntries).getKey().length();
+  &hellip;
+}
+```</p>
+
+<h4>2.3. Gets the proper string representation of each entry.</h4>
+
+<p><code>FluentIterable#transform</code> is used here to transform entry list to string list.</p>
+
+<p>```java Transforms each entry to string
+public static String getBarChartFromRangesByNameJava7(Map&lt;String, Range> data, int stepSize) {
+  &hellip;
+  int barLength = enclosingRange.length() / stepSize;
+  List<String> barTextList = FluentIterable.from(filteredAndSortedEntries)</p>
+
+<pre><code>  .transform(new Function&lt;Entry&lt;String, Range&gt;, String&gt;(){
+@Override
+public String apply(Entry&lt;String, Range&gt; input) {
+  return String.format("%" + longestNameLength + "s :", input.getKey())
+      + Strings.repeat("-", input.getValue().begin)
+      + Strings.repeat("*", input.getValue().length())
+      + Strings.repeat("-", barLength - input.getValue().end);
+}
+</code></pre>
+
+<p>  }).toList();
+  &hellip;
+}
+```</p>
+
+<h3>3. Joins the Strings by a line return separator and return.</h3>
+
+<p>Java 7 does not have a decent <code>String.join(...)</code> method, fortunately we get <a href="https://code.google.com/p/guava-libraries/wiki/StringsExplained#Joiner">Joiner</a> in <a href="https://code.google.com/p/guava-libraries/">Guava</a>.</p>
+
+<p><code>java Joins string using Joiner in Guava
+public static String getBarChartFromMap(Map&lt;String, Range&gt; data, int stepSize) {
+  ...
+  return Joiner.on("\r\n").join(barTextList);
+}
+</code></p>
+
+<h3>Whole code</h3>
+
+<p>Now we can take a look of the whole code in Java 7.</p>
+
+<p>```java Great Java 7 solution
+public static Range getEnclosingRange(Iterable<Range> ranges) {
+  int enclosingBegin = new Ordering<Range>(){</p>
+
+<pre><code>@Override
+public int compare(Range left, Range right) {
+  return Integer.compare(left.begin, right.begin);
+}
+</code></pre>
+
+<p>  }.min(ranges).begin;
+  int enclosingEnd = new Ordering<Range>(){</p>
+
+<pre><code>@Override
+public int compare(Range left, Range right) {
+  return Integer.compare(left.end, right.end);
+}
+</code></pre>
+
+<p>  }.max(ranges).end;
+  return new Range(enclosingBegin, enclosingEnd);
+}</p>
+
+<p>public static String getBarChartTextJava7(Map&lt;String, Range> data, int stepSize) {
+  checksNotNull(data);
+  checksArgument(!data.isEmpty() &amp;&amp; stepSize > 0);
+  Range enclosingRange = getEnclosingRange(data.values());
+  List&lt;Entry&lt;String, Range>> filteredAndSortedEntries = FluentIterable.from(data.entrySet())
+  .transform(new Function&lt;Entry&lt;String, Range>, Entry&lt;String, Range>>() {</p>
+
+<pre><code>@Override
+public Entry&lt;String, Range&gt; apply(Entry&lt;String, Range&gt; input) {
+  Range range = input.getValue();
+  return Maps.immutableEntry(input.getKey(), new Range(
+      (range.begin - enclosingRange.begin) / stepSize,
+      (range.end - enclosingRange.begin) / stepSize));
+}
+</code></pre>
+
+<p>  }).filter(new Predicate&lt;Entry&lt;String, Range>>() {</p>
+
+<pre><code>@Override
+public boolean apply(Entry&lt;String, Range&gt; input) {
+  return input.getValue().length() &gt; 0;
+}
+</code></pre>
+
+<p>  }).toSortedList(new Comparator&lt;Entry&lt;String, Range>>(){</p>
+
+<pre><code>@Override
+public int compare(Entry&lt;String, Range&gt; left, Entry&lt;String, Range&gt; right) {
+  return Integer.compare(left.getValue().begin, right.getValue().begin);
+}
+</code></pre>
+
+<p>  });
+  if (filteredAndSortedEntries.isEmpty()) {</p>
+
+<pre><code>return "";
+</code></pre>
+
+<p>  }
+  int longestNameLength = new Ordering&lt;Entry&lt;String, Range>>() {</p>
+
+<pre><code>@Override
+public int compare(Map.Entry&lt;String,Range&gt; left, Map.Entry&lt;String,Range&gt; right) {
+  return Integer.compare(left.getKey().length(), right.getKey().length());
+}
+</code></pre>
+
+<p>  }.max(filteredAndSortedEntries).getKey().length();
+  int barLength = enclosingRange.length() / stepSize;
+  List<String> barTextList = FluentIterable.from(filteredAndSortedEntries)</p>
+
+<pre><code>  .transform(new Function&lt;Entry&lt;String, Range&gt;, String&gt;(){
+@Override
+public String apply(Entry&lt;String, Range&gt; input) {
+  return String.format("%" + longestNameLength + "s :", input.getKey())
+      + Strings.repeat("-", input.getValue().begin)
+      + Strings.repeat("*", input.getValue().length())
+      + Strings.repeat("-", barLength - input.getValue().end);
+}
+</code></pre>
+
+<p>  }).toList();
+  return Joiner.on(&ldquo;\r\n&rdquo;).join(barTextList);
+}
+```</p>
+
+<p>I must admit it&rsquo;s freaking long(with over <strong>60</strong> lines) and unreadable(the spiky bracket hurt my eye badly &ndash;_&ndash;). Yes, I can break it into more small methods. Then there are more boilderplate code. I&rsquo;ll do the refactoring only if I get paid per line.</p>
+
+<p>We know Java 8 introduced <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a> and <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a>, let&rsquo;s see what Java 8 can do.</p>
+
+<h2>Coding in &ldquo;new&rdquo; java way</h2>
+
+<h3>1. Does some sanity check</h3>
+
+<p>No fancy tricks here, same as always.</p>
+
+<p><code>java Sanity check
+public static String getBarChartFromRangesByNameJava8(Map&lt;String, Range&gt; data, int stepSize) {
+  checkNotNull(data);
+  checkArgument(!data.isEmpty() &amp;&amp; stepSize &gt; 0);
+  ...
+}
+</code></p>
+
+<h3>2. Transforms each record to appropriate string form</h3>
+
+<h4>2.1. Calculates how many symbols are needed for each record</h4>
+
+<h5>2.1.1. Gets the enclosing range of all ranges</h5>
+
+<p>With the help of <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a> and lambda expression, the code gets more simplified and readable.</p>
+
+<p><code>r -&gt; r.begin</code> is the shorthand form lambda in java 8(who says C# copies java?), it&rsquo;s equivalent to <code>(Range r) -&gt; { return r.begin; }</code> here, I skipped the type declaration and brackets for simplicity.</p>
+
+<p><code>Integer::compare</code> is another nice java 8 feature called <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/methodreferences.html">Method Reference</a>. It allows you to call an existing method by name so you don&rsquo;t have to write <code>(i1, i2) -&gt; Integer.compare(r1, r2)</code> just to wrap <code>Integer.compare</code>.</p>
+
+<p>You may notice the <code>&lt;Integer&gt;</code> declaration before <code>map</code> method, it&rsquo;s pretty annoying but it&rsquo;s indispensable here since I would get a compiliation error without it. I wonder why they can&rsquo;t also do some type inference here. Weird.</p>
+
+<p>You need to call <code>get</code> method to get the value since <code>min</code> returns an <code>Optional&lt;T&gt;</code> here, I suspect they borrowed the idea from <a href="https://code.google.com/p/guava-libraries/wiki/UsingAndAvoidingNullExplained#Optional">Optional</a> in <a href="https://code.google.com/p/guava-libraries/">Guava</a>.</p>
+
+<p>```java Gets enclosing range using lambda and stream API
+public static String getBarChartFromRangesByNameJava8(Map&lt;String, Range> data, int stepSize) {
+  &hellip;
+  Range enclosingRange = new Range(</p>
+
+<pre><code>  data.values().stream().&lt;Integer&gt;map(r -&gt; r.begin).min(Integer::compare).get(),
+  data.values().stream().&lt;Integer&gt;map(r -&gt; r.end).max(Integer::compare).get());
+</code></pre>
+
+<p>  &hellip;
+```</p>
+
+<p>I found a more succinct way later, it seems <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a> provides specific API for primitive types.</p>
+
+<p>```java Primitive type specific stream API
+public static String getBarChartFromRangesByNameJava8(Map&lt;String, Range> data, int stepSize) {
+  &hellip;
+  Range enclosingRange = new Range(</p>
+
+<pre><code>  data.values().stream().mapToInt(r -&gt; r.begin).min().getAsInt(),
+  data.values().stream().mapToInt(r -&gt; r.end).max().getAsInt());
+</code></pre>
+
+<p>  &hellip;
+```</p>
+
+<h5>2.1.2. Gets transformed entries from the enclosing range and stepSize</h5>
+
+<h5>2.1.3. Filters trivial entries and sorts them by range&rsquo;s begin</h5>
+
+<p>This is almost a java 8 &ldquo;translation&rdquo; the java 7 version. Thanks to <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a>, the <em>annoynymous</em> class is no longer needed.</p>
+
+<p><code>Stream#collect(Collectors#toList())</code> here is used to transform <code>Stream&lt;T&gt;</code> to <code>List&lt;T&gt;</code>, <code>Collectors</code> is a big class provides a variety of <code>Collector</code>s, which including <code>toMap</code>, <code>toSet</code>, <code>joining</code> and other useful utilities.</p>
+
+<p>```java transforming, filtering and sorting
+public static String getBarChartFromRangesByNameJava8(Map&lt;String, Range> data, int stepSize) {
+  &hellip;
+  List&lt;Entry&lt;String, Range>> recordList = data.entrySet().stream()</p>
+
+<pre><code>  .&lt;Entry&lt;String, Range&gt;&gt;map(entry -&gt; Maps.immutableEntry(entry.getKey(),
+    new Range((entry.getValue().begin - enclosingRange.begin) / stepSize,
+        (entry.getValue().end - enclosingRange.begin) / stepSize)))
+  .filter(entry -&gt; entry.getValue().length() &gt;= 1)
+  .sorted((lhv, rhv) -&gt; Integer.compare(lhv.getValue().begin, rhv.getValue().begin))
+  .collect(Collectors.toList());
+</code></pre>
+
+<p>  if (recordList.isEmpty()) {</p>
+
+<pre><code>return "";
+</code></pre>
+
+<p>  }
+  &hellip;
+```</p>
+
+<h4>2.2. Gets the length of longest name for further alignment.</h4>
+
+<p>That&rsquo;s pretty straightforward.</p>
+
+<p>```java Gets length of the longest name
+public static String getBarChartFromRangesByNameJava8(Map&lt;String, Range> data, int stepSize) {
+  &hellip;</p>
+
+<pre><code>int longestNameLength = recordList.stream()
+  .&lt;Integer&gt;map(entry -&gt; entry.getKey().length()).max(Integer::compare).get();
+</code></pre>
+
+<p>  &hellip;
+```</p>
+
+<h4>2.3. Gets the proper string representation of each record.</h4>
+
+<h3>3. Joins the string list by a line return separator and return.</h3>
+
+<p>Also straight forward. <code>Stream#map</code> is used to transform entries into strings.</p>
+
+<p>Since there&rsquo;re no null element, <a href="https://code.google.com/p/guava-libraries/wiki/StringsExplained#Joiner">Joiner</a> would be an overkill. A <code>Collectors.joining</code> would suffice.</p>
+
+<p>```java Gets string result
+public static String getBarChartFromRangesByNameJava8(Map&lt;String, Range> data, int stepSize) {
+  &hellip;
+  int barLength = enclosingRange.length() / stepSize;
+  return recordList.stream()</p>
+
+<pre><code>  .&lt;String&gt;map(entry -&gt; String.format("%" + longestNameLength + "s: ", entry.getKey())
+      + Strings.repeat("-", entry.getValue().begin)
+      + Strings.repeat("*", entry.getValue().length())
+      + Strings.repeat("-", barLength - entry.getValue().end))
+  .collect(Collectors.joining("\r\n"));
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Whole code</h3>
+
+<p>```java Succinct Java 8 Solution
+public static String getBarChartFromRangesByNameJava8(Map&lt;String, Range> data, int stepSize) {
+  checkNotNull(data);
+  checkArgument(!data.isEmpty() &amp;&amp; stepSize > 0);
+  Range enclosingRange =</p>
+
+<pre><code>  new Range(data.values().stream().&lt;Integer&gt;map(r -&gt; r.begin).min(Integer::compare).get(),
+      data.values().stream().&lt;Integer&gt;map(r -&gt; r.end).max(Integer::compare).get());
+</code></pre>
+
+<p>  List&lt;Entry&lt;String, Range>> recordList = data.entrySet().stream()</p>
+
+<pre><code>  .&lt;Entry&lt;String, Range&gt;&gt;map(entry -&gt; Maps.immutableEntry(entry.getKey(),
+    new Range((entry.getValue().begin - enclosingRange.begin) / stepSize,
+        (entry.getValue().end - enclosingRange.begin) / stepSize)))
+  .filter(entry -&gt; entry.getValue().length() &gt;= 1)
+  .sorted((lhv, rhv) -&gt; Integer.compare(lhv.getValue().begin, rhv.getValue().begin))
+  .collect(Collectors.toList());
+</code></pre>
+
+<p>  if (recordList.isEmpty()) {</p>
+
+<pre><code>return "";
+</code></pre>
+
+<p>  }
+  int longestNameLength = recordList.stream()</p>
+
+<pre><code>  .&lt;Integer&gt;map(entry -&gt; entry.getKey().length()).max(Integer::compare).get();
+</code></pre>
+
+<p>  int barLength = enclosingRange.length() / stepSize;
+  return recordList.stream()</p>
+
+<pre><code>  .&lt;String&gt;map(entry -&gt; String.format("%" + longestNameLength + "s: ", entry.getKey())
+      + Strings.repeat("-", entry.getValue().begin)
+      + Strings.repeat("*", entry.getValue().length())
+      + Strings.repeat("-", barLength - entry.getValue().end))
+  .collect(Collectors.joining("\r\n"));
+</code></pre>
+
+<p>}
+```
+Java 8 simpilfies this task greatly by the help of <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a> and <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a>. The code lines count drops significantly from over 60 lines to 26 lines by the elimination of <em>annoynymous</em> classes.</p>
+
+<p>I have to admit Java 8 made considerable progress over Java 7. But it <strong>COULD</strong> be even better. Let&rsquo;s see how C# tackle this.</p>
+
+<h2>What about C#?</h2>
+
+<h3>1. Does some sanity check</h3>
+
+<p>Raise an <code>ArgumentException</code> if something went crazy.</p>
+
+<p>```c# Sanity check
+public static string GenerateBarChartText(Dictionary&lt;String, Range> data, int stepSize)
+{</p>
+
+<pre><code>if (data == null || data.Count == 0 || stepSize &lt;= 0)
+{
+    throw new ArgumentException();
+}
+...
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>2. Transforms each Entry to appropriate String form</h3>
+
+<h4>2.1. Calculates how many symbols are needed for each Entry</h4>
+
+<h5>2.1.1. Gets the enclosing Range of all ranges</h5>
+
+<p>With the help of <a href="http://msdn.microsoft.com/en-us/library/x9fsa0sw.aspx">Property Syntax</a> and <a href="http://msdn.microsoft.com/en-us/library/bb397926.aspx">LINQ</a>. One line would suffice.</p>
+
+<p><code>c# Gets enclosing range in one line
+Range enclosingRange = new Range(data.Values.Min(r =&gt; r.Begin), data.Values.Max(r =&gt; r.End));
+</code></p>
+
+<p>Which is much more succinct than the Java 8 version:</p>
+
+<p>```java Not so succinct Java 8
+Range enclosingRange =</p>
+
+<pre><code>new Range(data.values().stream().mapToInt(r -&gt; r.begin).min().getAsInt(),
+    data.values().stream().mapToInt(r -&gt; r.end).max().getAsInt());
+</code></pre>
+
+<p>```</p>
+
+<p>I am very <a name="surprised">surprised</a> that there is not a <code>Max(selector)</code> equivalence in Java 8(e.g. <code>Stream#max(Function&lt;T, ? extends Comparable&gt;)</code>), which means you can only write <code>stream.&lt;Integer&gt;map(obj -&gt; obj.intValue).max(Integer::compare)</code> in Java 8 instead of the much more succint <code>stream.max(obj -&gt; obj.intValue)</code>, again, weird.</p>
+
+<p>It&rsquo;s not hard to write a Java 8 version of <code>Max(selector)</code>.</p>
+
+<p>```java
+public static &lt;T, R extends Comparable&lt;? super R>> Optional<T> maxBySelector(Stream<T> stream,</p>
+
+<pre><code>Function&lt;T, R&gt; selector) {
+</code></pre>
+
+<p>  return stream.max((t1, t2) &ndash;> selector.apply(t1).compareTo(selector.apply(t2)));
+}
+```</p>
+
+<p>Then test it with a selector <code>s -&gt; s.length()</code>:</p>
+
+<p><code>java test failure
+System.out.println(maxBySelector(data.keySet().stream(), s -&gt; s.length()));
+</code></p>
+
+<p>Then something more weird happens: A compiler error! It seems eclipse does not handle lambdas well at this moment.</p>
+
+<p><code>java compiler failure
+Internal compiler error: java.lang.NullPointerException at org.eclipse.jdt.internal.compiler.ast.LambdaExpression.analyseCode(LambdaExpression.java:395)
+</code></p>
+
+<p>I made type parameter explicit but it still not compile.</p>
+
+<p><code>java eclipse failure
+System.out.println(&lt;String, Integer&gt;maxBySelector(data.keySet().stream(), s -&gt; s.length()));
+</code></p>
+
+<p>Finally it worked after I added class name.</p>
+
+<p><code>java readability failure
+System.out.println(Sample.&lt;String, Integer&gt;maxBySelector(data.keySet().stream(), s -&gt; s.length()));
+</code></p>
+
+<p>And it looks a mess. I suspect they don&rsquo;t provide a <code>Max(selector)</code> just because some compiler did not support it, damn.</p>
+
+<h5>2.1.2. Gets transformed records from the enclosing range and stepSize</h5>
+
+<h5>2.1.3. Filters trivial records and sorts them by range&rsquo;s begin value</h5>
+
+<p>I don&rsquo;t like <code>KeyValuePair&lt;T&gt;</code> here since there&rsquo;s no meaning on <code>Key</code> and <code>Value</code>, <a href="http://msdn.microsoft.com/en-us/library/bb397696.aspx">Anonymous Type</a> and <a href="http://msdn.microsoft.com/en-us/library/bb383973.aspx">Implicit Type</a> in C# provide a handy way to create instances of a temporary type. And code becomes more readable than Java 8 version(Which gets numerous spiky brackets).</p>
+
+<p>```c# Transforming, filtering and sorting
+public static string GenerateBarChartText(Dictionary&lt;String, Range> data, int stepSize)
+{</p>
+
+<pre><code>...
+var records = data.Select(p =&gt; new
+{
+    Name = p.Key,
+    Range = new Range((p.Value.Begin - enclosingRange.Begin) / stepSize,
+        (p.Value.End - enclosingRange.Begin) / stepSize),
+}).Where(i =&gt; i.Range.Length &gt; 0).OrderBy(i =&gt; i.Range.Length).ToList();
+if (records.Count == 0) {
+    return string.Empty;
+}
+....
+</code></pre>
+
+<p>```</p>
+
+<p>Again, an <code>OrderBy(selector)</code> is missing in Java 8, although Java 8 provides a parameterless natural  <code>Stream#sorted()</code>, but <code>stream.&lt;Integer&gt;map(r -&gt; r.intValue).sorted()</code> is still messier than <code>stream.sorted(r -&gt; r.intValue)</code>. Maybe they will say it&rsquo;s for performance &ndash;_&ndash;</p>
+
+<h4>2.2. Gets the length of longest name for further alignment.</h4>
+
+<p><code>c# Gets length of the longest name
+int longestNameLength = records.Max(s =&gt; s.Name.Length);
+</code></p>
+
+<p>Which is far more succint than the Java 8 version:</p>
+
+<p>```java Not so succinct Java 8
+int longestNameLength = recordList.stream()</p>
+
+<pre><code>.&lt;Integer&gt;map(entry -&gt; entry.getKey().length()).max(Integer::compare).get();
+</code></pre>
+
+<p>```</p>
+
+<h4>2.3. Gets the proper string representation of each record.</h4>
+
+<h3>3. Joins the string list by a line return separator and return.</h3>
+
+<p>Almost identical to the Java 8 version.</p>
+
+<p>```c# Gets string result
+public static string GenerateBarChartText(Dictionary&lt;String, Range> data, int stepSize)
+{</p>
+
+<pre><code>...
+return string.Join("\r\n",
+    records.Select(i =&gt; string.Format("{0," + longestNameLength + "}: ", i.Name)
+        + new String('-', i.Range.Begin)
+        + new String('*', i.Range.Length)
+        + new String('-', totalCount - i.Range.Length)));
+</code></pre>
+
+<p>}
+```</p>
+
+<h3>Whole code</h3>
+
+<p>```c# Even more better C# solution
+public static string GenerateBarChartText(Dictionary&lt;String, Range> data, int stepSize)
+{</p>
+
+<pre><code>if (data == null || data.Count == 0 || stepSize &lt;= 0)
+{
+    throw new ArgumentException();
+}
+Range enclosingRange = new Range(data.Values.Min(r =&gt; r.Begin), data.Values.Max(r =&gt; r.End));
+var records = data.Select(p =&gt; new
+{
+    Name = p.Key,
+    Range = new Range((p.Value.Begin - enclosingRange.Begin) / stepSize,
+        (p.Value.End - enclosingRange.Begin) / stepSize),
+}).Where(i =&gt; i.Range.Length &gt; 0).OrderBy(i =&gt; i.Range.Length).ToList();
+if (records.Count == 0) {
+    return string.Empty;
+}
+int longestNameLength = records.Max(s =&gt; s.Name.Length);
+int totalCount = enclosingRange.Length / stepSize;
+return string.Join("\r\n",
+    records.Select(i =&gt; string.Format("{0," + longestNameLength + "}: ", i.Name)
+        + new String('-', i.Range.Begin)
+        + new String('*', i.Range.Length)
+        + new String('-', totalCount - i.Range.Length)));
+</code></pre>
+
+<p>}
+```</p>
+
+<p>You can find lots of similarities between Java 8 and C# 4, but C# code looks more readable, since C# has a more dedicated type inference mechanism(which eliminates almost all explicit type parameters) and a more succinct API.</p>
+
+<p>They have more brilliant language designers and compiler designers.</p>
+
+<h2>Conclusions</h2>
+
+<p><strong>DISCLAIMER</strong>: Following conclusions are only based on the case in this article.</p>
+
+<h3>Java 7</h3>
+
+<p>Totally a mess and outdated, a typical <strong>write more do less</strong> programming language. It <em>supports</em> functional programming <strong>ACCIDENTALLY</strong> by a shitty verbose <em>annoynymous</em> class, which would make things even more complicated.</p>
+
+<p>In my perspective:</p>
+
+<blockquote><p>Programming in plain Java 7 is like you are talking to a half <strong>deaf also dumb</strong> ass that you have to shout every words in three times, then you begin to feel if you are dumb too.</p></blockquote>
+
+<h3>Java 8</h3>
+
+<p>A big leap since Java 7, the introduction of <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">lambda expression</a> releases old java users from the shitty verbose <em>annoynymous</em> class syntax, and <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a> makes collection operations easiser.</p>
+
+<p>However, Java 8 is still far away from usability:</p>
+
+<ul>
+<li>Java 8 might not deaf but still dumb, you still have to say everything twice. It has type inference, but only work in limited case so code like <code>Map&lt;String, String&gt; map = Maps.&lt;String,String&gt;builder().put(x).build()</code> and <code>stream.&lt;String&gt;map(i -&gt; Integer.toString(i))</code> is still avoidable.</li>
+<li>The <a href="http://download.java.net/jdk8/docs/api/java/util/stream/Stream.html">Java Stream API</a> is still verbose and confusing
+
+<ul>
+<li>It did not have any <code>minBy(selector)</code> or <code>toSortedBy(selector)</code>, and you can hardly implement one yourself(<a href="#surprised">Surprising</a>).</li>
+<li>Stream is <strong>NOT</strong> stateless, you can <strong>NOT</strong> reuse a stream which had been applied a teminate operation(e.g. <code>stream.count()</code> would fail after you called <code>stream.max()</code>), maybe that has a performance gain, but it looks weird.</li>
+<li>You have to call <code>get</code> on every reducing operation since they returns a <code>Optional&lt;T&gt;</code>, which makes code more verbose.(That might be nit, but I think a <code>maxOrDefault</code> is better in this case)</li>
+<li>It uses a <code>Collector</code> to make <code>Stream</code> into other type like <code>String</code>, <code>List</code> and <code>Map</code>, which produces very weird API: You have to use <code>stream.collect(Collectors.toList())</code> instead of <code>stream.toList()</code>, <code>stream.collect(Collectors.joining("\n"))</code> instead of <code>stream.joining("\n")</code></li>
+</ul>
+</li>
+<li>Very limited compiler support, my Eclipse often hangs or pops up an alert window when writing lambdas in stream API. Also code suggestion works badly in lambda expressions.</li>
+</ul>
+
+
+<p>Which draws a frustrating conclusion:</p>
+
+<blockquote><p>It took these java designers over 5 years effort to make something that can not even beat a 5-years-ago C# 3 on collection operations.</p></blockquote>
+
+<h3>C# 4</h3>
+
+<p>In this case, C# 4 is the undisputed winner. Powered by <a href="http://msdn.microsoft.com/en-us/library/bb397926.aspx">LINQ</a>, <a href="http://msdn.microsoft.com/en-us/library/bb397696.aspx">Anonymous Type</a> and <a href="http://msdn.microsoft.com/en-us/library/x9fsa0sw.aspx">Property Syntax</a>, C# allows you to finish the task fluently and produce more readable code. Since I did not touch any C# 4 features, so this conclusion also works in C# 3.</p>
+
+<p>But</p>
+
+<blockquote><p>the awful fact is I may have to use java 7 for many years, sometimes I hope I never learnt other languages, so I could feel like I&rsquo;m using the best programming languages now. &ndash;_&ndash;</p></blockquote>
+
+<h2>References</h2>
+
+<ol>
+<li>Lambda expressions in Java 8 Tutorials: <a href="http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html">http://docs.oracle.com/javase/tutorial/java/javaOO/lambdaexpressions.html</a></li>
+<li>Java 8 Stream API: <a href="http://www.slideshare.net/BjrnKimminich/java-8-streams">http://www.slideshare.net/BjrnKimminich/java-8-streams</a></li>
+<li>guava-libraries: <a href="https://code.google.com/p/guava-libraries/wiki/GuavaExplained">https://code.google.com/p/guava-libraries/wiki/GuavaExplained</a></li>
+</ol>
+
+]]></content>
+  </entry>
+  
+</feed>
