@@ -1,0 +1,400 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>On Reading SICP (01) - Lucids</title>
+  <meta name="author" content="Lucids">
+
+  
+  <meta name="description" content="First blog on reading SICP">
+  <meta name="keywords" content="SICP, Scheme, Programming">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://lucids.github.io/blog/on-reading-sicp-01">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Lucids" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Lucids</a></h1>
+  
+    <h2>Life Love Tech</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sites" value="lucids.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="http://zh.lucida.me">Chinese</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">On Reading SICP (01)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-12T23:52:38+00:00" pubdate data-updated="true">Jan 12<span>th</span>, 2014</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://lucids.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h2>On Reading SICP (01)</h2>
+
+<h3>What&rsquo;s this?</h3>
+
+<p><strong>On Reading SICP</strong> is a serie of blogs while I am reading <a href="http://mitpress.mit.edu/sicp/">SICP</a>, including notes, thoughts and exercise solutions.</p>
+
+<h3>About SICP</h3>
+
+<p>I&rsquo;ve read first 2 chapters when I was in university. After reading Peter Norvig&rsquo;s <a href="http://www.amazon.com/review/R403HR4VL71K8">review</a> on this book, I decided to pick it up and read it through now.</p>
+
+<blockquote><p> &ldquo;I read a draft version of the book around 1982, when I was in grad school, and it changed the way I think about my profession. If you&rsquo;re a thoughtful computer scientist (or want to be one), it will change your life too.&rdquo;</p></blockquote>
+
+<p>I don&rsquo;t think I am a thoughtful computer scientist, but I think SICP could teach me some advanced programming skills.</p>
+
+<blockquote><p>&ldquo;To use an analogy, if SICP were about automobiles, it would be for the person who wants to know how cars work, how they are built, and how one might design fuel-efficient, safe, reliable vehicles for the 21st century.&rdquo;</p></blockquote>
+
+<p>That&rsquo;s exactly what I want to learn.</p>
+
+<blockquote><p>&ldquo;Those who hate SICP think it doesn&rsquo;t deliver enough tips and tricks for the amount of time it takes to read. But if you&rsquo;re like me, you&rsquo;re not looking for one more trick, rather you&rsquo;re looking for a way of synthesizing what you already know, and building a rich framework onto which you can add new learning over a career. That&rsquo;s what SICP has done for me.&rdquo;</p></blockquote>
+
+<p>I want to build a rich framework as well :)</p>
+
+<h3>Notes</h3>
+
+<blockquote><p>The acts of the mind, wherein it exerts its power over simple ideas, are chiefly these three:</p>
+
+<p>1, Combing serveral simple ideas into one compound one, and thus all complex ideas are made.</p>
+
+<p>2, The second is bringing two ideas, whether simple or complex, together, and setting them by one another so as to take a view of them at once, without uniting them into one, by which it gets all its ideas of relations.</p>
+
+<p>3, The third is separating them from all other ideas that accompany them in their real existence: this is called abstraction, and thus all its general ideas are made.</p>
+
+<p>John Locke, An Essay Concerning Human Understanding (1690)</p></blockquote>
+
+<h3>Exercises</h3>
+
+<h4>1.1 ~ 1.4</h4>
+
+<p>Too trivial to write.</p>
+
+<h4>1.5</h4>
+
+<p>With the definition of</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">p</span><span class="p">)</span> <span class="p">(</span><span class="nf">p</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">test</span> <span class="nv">x</span> <span class="nv">y</span><span class="p">)</span> <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">x</span> <span class="mi">0</span><span class="p">)</span> <span class="mi">0</span> <span class="nv">y</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>If the interpreter is using applicative-order evaluation:</p>
+
+<p><code>(test 0 (p))</code> will simply return 0</p>
+
+<p>If the interpreter is using normal-order evalulation:</p>
+
+<p><code>(test 0 (p))</code> will hang since interpreter will keep expanding (p) until it runs out of memory</p>
+
+<h4>1.6</h4>
+
+<p>Alyssa&rsquo;s <code>new-if</code> will hang because scheme uses applicative-order evaluation.
+<code>sqrt-iter</code> will keep expanding <code>else-clause</code> in <code>(new-if predicate then-clause else-clause)</code> until it runs out of memory.</p>
+
+<h4>1.7</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">good-enough?by-ratio</span> <span class="nv">curr</span> <span class="nv">next</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">&lt; </span><span class="p">(</span><span class="nb">/ </span><span class="p">(</span><span class="nb">abs </span><span class="p">(</span><span class="nb">- </span><span class="nv">next</span> <span class="nv">curr</span><span class="p">))</span> <span class="nv">curr</span><span class="p">)</span> <span class="mf">0.001</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">sqrt-iter-by-change-ratio</span> <span class="nv">guess</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">if </span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">good-enough?by-ratio</span> <span class="nv">guess</span> <span class="p">(</span><span class="nf">improve</span> <span class="nv">guess</span> <span class="nv">x</span><span class="p">))</span> <span class="nv">guess</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">sqrt-iter-by-change-ratio</span> <span class="p">(</span><span class="nf">improve</span> <span class="nv">guess</span> <span class="nv">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">sqrt2</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nf">sqrt-iter-by-change-ratio</span> <span class="mf">1.0</span> <span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><code>sqrt2</code> works better for very small input, but badly for large input.</p>
+
+<figure class='code'><figcaption><span>comparison between sqrt1 and sqrt2</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">square</span> <span class="p">(</span><span class="nf">sqrt1</span> <span class="mi">2</span><span class="p">))</span>
+</span><span class='line'><span class="mf">2.0000060073048824</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">square</span> <span class="p">(</span><span class="nf">sqrt2</span> <span class="mi">2</span><span class="p">))</span>
+</span><span class='line'><span class="mf">2.0000060073048824</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">square</span> <span class="p">(</span><span class="nf">sqrt1</span> <span class="mf">0.02</span><span class="p">))</span>
+</span><span class='line'><span class="mf">0.020858236746628435</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">square</span> <span class="p">(</span><span class="nf">sqrt2</span> <span class="mf">0.02</span><span class="p">))</span>
+</span><span class='line'><span class="mf">0.02000882829073966</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">square</span> <span class="p">(</span><span class="nf">sqrt1</span> <span class="mi">2000</span><span class="p">))</span>
+</span><span class='line'><span class="mf">2000.0000009062444</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">square</span> <span class="p">(</span><span class="nf">sqrt2</span> <span class="mi">2000</span><span class="p">))</span>
+</span><span class='line'><span class="mf">2000.0851484886473</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.8</h4>
+
+<figure class='code'><figcaption><span>program</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">cube</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">x</span> <span class="nv">x</span> <span class="nv">x</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">good-enough-cubr?</span> <span class="nv">guess</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">&lt; </span><span class="p">(</span><span class="nb">abs </span><span class="p">(</span><span class="nb">- </span><span class="p">(</span><span class="nf">cube</span> <span class="nv">guess</span><span class="p">)</span> <span class="nv">x</span><span class="p">))</span> <span class="mf">0.001</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">improve-cubr</span> <span class="nv">guess</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nb">/ </span><span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nb">/ </span><span class="nv">x</span> <span class="p">(</span><span class="nf">square</span> <span class="nv">guess</span><span class="p">))</span> <span class="p">(</span><span class="nb">* </span><span class="mi">2</span> <span class="nv">guess</span><span class="p">))</span> <span class="mi">3</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">cubr-iter</span> <span class="nv">guess</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nf">good-enough-cubr?</span> <span class="nv">guess</span> <span class="nv">x</span><span class="p">)</span> <span class="nv">guess</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">cubr-iter</span> <span class="p">(</span><span class="nf">improve-cubr</span> <span class="nv">guess</span> <span class="nv">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">cubr</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nf">cubr-iter</span> <span class="mf">1.0</span> <span class="nv">x</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">cubr</span> <span class="mf">3.0</span><span class="p">)</span>
+</span><span class='line'><span class="mf">1.4422497895989996</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">cube</span> <span class="p">(</span><span class="nf">cubr</span> <span class="mf">3.0</span><span class="p">))</span>
+</span><span class='line'><span class="mf">3.0000013684348827</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Lucids</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-12T23:52:38+00:00" pubdate data-updated="true">Jan 12<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>, <a class='category' href='/blog/categories/reading/'>Reading</a>, <a class='category' href='/blog/categories/sicp/'>SICP</a>, <a class='category' href='/blog/categories/scheme/'>Scheme</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://lucids.github.io/blog/on-reading-sicp-01/" data-via="" data-counturl="http://lucids.github.io/blog/on-reading-sicp-01/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/a-taste-of-functional-programming-in-java-7/" title="Previous Post: A taste of Functional Programming in Java 7, Java 8 and C# 4">&laquo; A taste of Functional Programming in Java 7, Java 8 and C# 4</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <img src="http://imgur.com/nZXZVhG.png" width="128px" height="128px">
+  <p>My name is Peng Gong. I am a software engineer from China.</p>
+  <p>I got a B.S. degree from <a href="http://www.dlut.edu.cn" target="_blank">DLUT</a> and a M.S. degree <a href="http://www.buaa.edu.cn" target="_blank">BUAA</a>, both of them are in computer science.</p>
+  <p>I am founder of <a href="http://www.windowsphone.com/zh-cn/store/publishers?publisherId=LucSoft&amp;appId=3e4f73b2-c70e-40dd-b3b8-1d2135e9af56" target="_blank">LucSoft</a> and <a href="http://www.windowsphone.com/zh-cn/store/publishers?publisherId=IdaSoft&amp;appId=7f06890c-60d6-4ec7-880d-24a9dd24a283" target="_blank">IdaSoft</a>, which got some 100,000+ users apps like <a href="http://www.windowsphone.com/zh-cn/store/app/%E4%B8%AD%E6%96%87%E6%8B%A8%E5%8F%B7%E5%8A%A9%E6%89%8B/3e4f73b2-c70e-40dd-b3b8-1d2135e9af56" target="_blank">RazorDialer</a> and <a href="http://www.windowsphone.com/zh-cn/store/app/%E9%87%91%E5%BA%B8%E5%85%A8%E9%9B%86/7f06890c-60d6-4ec7-880d-24a9dd24a283" target="_blank">JoyReader</a>,</p>
+  <p><a href="http://book.douban.com/people/figure9/" target="_blank">Readings</a> and <a href="http://book.douban.com/people/figure9/reviews" target="_blank">reviews</a>.</p>
+  <p>I am currently working at <a href="http://www.google.co.uk/about/jobs/locations/london/" target="_blank">Google London</a>,</p>
+  <p>I blog for myself, nothing here represents the views, options or proclivities of my employer.</p>
+</section><section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/on-reading-sicp-01/">On Reading SICP (01)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/a-taste-of-functional-programming-in-java-7/">A Taste of Functional Programming in Java 7, Java 8 and C# 4</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/first-article/">First Article</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/blog/categories/c-'>C# (1)</a></li><li><a href='/blog/categories/java'>Java (1)</a></li><li><a href='/blog/categories/programming'>Programming (2)</a></li><li><a href='/blog/categories/reading'>Reading (1)</a></li><li><a href='/blog/categories/scheme'>Scheme (1)</a></li><li><a href='/blog/categories/sicp'>SICP (1)</a></li></ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Lucids -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'lucids';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://lucids.github.io/blog/on-reading-sicp-01/';
+        var disqus_url = 'http://lucids.github.io/blog/on-reading-sicp-01/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Programming | Lucids]]></title>
   <link href="http://lucids.github.io/blog/categories/programming/atom.xml" rel="self"/>
   <link href="http://lucids.github.io/"/>
-  <updated>2014-01-12T18:28:31+00:00</updated>
+  <updated>2014-01-12T23:56:29+00:00</updated>
   <id>http://lucids.github.io/</id>
   <author>
     <name><![CDATA[Lucids]]></name>
@@ -12,6 +12,130 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[On Reading SICP (01)]]></title>
+    <link href="http://lucids.github.io/blog/on-reading-sicp-01/"/>
+    <updated>2014-01-12T23:52:38+00:00</updated>
+    <id>http://lucids.github.io/blog/on-reading-sicp-01</id>
+    <content type="html"><![CDATA[<h2>On Reading SICP (01)</h2>
+
+<h3>What&rsquo;s this?</h3>
+
+<p><strong>On Reading SICP</strong> is a serie of blogs while I am reading <a href="http://mitpress.mit.edu/sicp/">SICP</a>, including notes, thoughts and exercise solutions.</p>
+
+<h3>About SICP</h3>
+
+<p>I&rsquo;ve read first 2 chapters when I was in university. After reading Peter Norvig&rsquo;s <a href="http://www.amazon.com/review/R403HR4VL71K8">review</a> on this book, I decided to pick it up and read it through now.</p>
+
+<blockquote><p> &ldquo;I read a draft version of the book around 1982, when I was in grad school, and it changed the way I think about my profession. If you&rsquo;re a thoughtful computer scientist (or want to be one), it will change your life too.&rdquo;</p></blockquote>
+
+<p>I don&rsquo;t think I am a thoughtful computer scientist, but I think SICP could teach me some advanced programming skills.</p>
+
+<blockquote><p>&ldquo;To use an analogy, if SICP were about automobiles, it would be for the person who wants to know how cars work, how they are built, and how one might design fuel-efficient, safe, reliable vehicles for the 21st century.&rdquo;</p></blockquote>
+
+<p>That&rsquo;s exactly what I want to learn.</p>
+
+<blockquote><p>&ldquo;Those who hate SICP think it doesn&rsquo;t deliver enough tips and tricks for the amount of time it takes to read. But if you&rsquo;re like me, you&rsquo;re not looking for one more trick, rather you&rsquo;re looking for a way of synthesizing what you already know, and building a rich framework onto which you can add new learning over a career. That&rsquo;s what SICP has done for me.&rdquo;</p></blockquote>
+
+<p>I want to build a rich framework as well :)</p>
+
+<h3>Notes</h3>
+
+<blockquote><p>The acts of the mind, wherein it exerts its power over simple ideas, are chiefly these three:</p>
+
+<p>1, Combing serveral simple ideas into one compound one, and thus all complex ideas are made.</p>
+
+<p>2, The second is bringing two ideas, whether simple or complex, together, and setting them by one another so as to take a view of them at once, without uniting them into one, by which it gets all its ideas of relations.</p>
+
+<p>3, The third is separating them from all other ideas that accompany them in their real existence: this is called abstraction, and thus all its general ideas are made.</p>
+
+<p>John Locke, An Essay Concerning Human Understanding (1690)</p></blockquote>
+
+<h3>Exercises</h3>
+
+<h4>1.1 ~ 1.4</h4>
+
+<p>Too trivial to write.</p>
+
+<h4>1.5</h4>
+
+<p>With the definition of</p>
+
+<p><code>scm
+(define (p) (p))
+(define (test x y) (if (= x 0) 0 y))
+</code></p>
+
+<p>If the interpreter is using applicative-order evaluation:</p>
+
+<p><code>(test 0 (p))</code> will simply return 0</p>
+
+<p>If the interpreter is using normal-order evalulation:</p>
+
+<p><code>(test 0 (p))</code> will hang since interpreter will keep expanding (p) until it runs out of memory</p>
+
+<h4>1.6</h4>
+
+<p>Alyssa&rsquo;s <code>new-if</code> will hang because scheme uses applicative-order evaluation.
+<code>sqrt-iter</code> will keep expanding <code>else-clause</code> in <code>(new-if predicate then-clause else-clause)</code> until it runs out of memory.</p>
+
+<h4>1.7</h4>
+
+<p><code>scm
+(define (good-enough?by-ratio curr next)
+  (&lt; (/ (abs (- next curr)) curr) 0.001))
+(define (sqrt-iter-by-change-ratio guess x)
+  (if
+   (good-enough?by-ratio guess (improve guess x)) guess
+   (sqrt-iter-by-change-ratio (improve guess x) x)))
+(define (sqrt2 x) (sqrt-iter-by-change-ratio 1.0 x))
+</code></p>
+
+<p><code>sqrt2</code> works better for very small input, but badly for large input.</p>
+
+<p>```scm comparison between sqrt1 and sqrt2</p>
+
+<blockquote><p>(square (sqrt1 2))
+2.0000060073048824
+(square (sqrt2 2))
+2.0000060073048824
+(square (sqrt1 0.02))
+0.020858236746628435
+(square (sqrt2 0.02))
+0.02000882829073966
+(square (sqrt1 2000))
+2000.0000009062444
+(square (sqrt2 2000))
+2000.0851484886473
+```</p></blockquote>
+
+<h4>1.8</h4>
+
+<p>```scm program
+(define (cube x) (<em> x x x))
+(define (good-enough-cubr? guess x)
+  (&lt; (abs (&ndash; (cube guess) x)) 0.001))
+(define (improve-cubr guess x)
+  (/ (+ (/ x (square guess)) (</em> 2 guess)) 3))
+(define (cubr-iter guess x)
+  (if (good-enough-cubr? guess x) guess</p>
+
+<pre><code>  (cubr-iter (improve-cubr guess x) x)))
+</code></pre>
+
+<p>(define (cubr x) (cubr-iter 1.0 x))
+```</p>
+
+<p>```scm output</p>
+
+<blockquote><p>(cubr 3.0)
+1.4422497895989996
+(cube (cubr 3.0))
+3.0000013684348827
+```</p></blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[A Taste of Functional Programming in Java 7, Java 8 and C# 4]]></title>
