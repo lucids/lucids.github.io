@@ -9,7 +9,8 @@
   <meta name="author" content="Lucids">
 
   
-  <meta name="description" content="On Reading SICP (01) What&rsquo;s this? On Reading SICP is a serie of blogs while I am reading SICP, including notes, thoughts and exercise solutions &hellip;">
+  <meta name="description" content="About From page 26 to page 47 Notes Scheme use lexical scope, as JavaScript did.
+Linear iteration is more efficient than linear recursion. Use a step &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -66,6 +67,313 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/on-reading-sicp-02/">On Reading SICP (02)</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-01-18T23:46:53+00:00" pubdate data-updated="true">Jan 18<span>th</span>, 2014</time>
+        
+           | <a href="/blog/on-reading-sicp-02/#disqus_thread"
+             data-disqus-identifier="http://lucids.github.io/blog/on-reading-sicp-02/">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h3>About</h3>
+
+<p>From page 26 to page 47</p>
+
+<h3>Notes</h3>
+
+<ul>
+<li>Scheme use <strong><a href="http://en.wikipedia.org/wiki/Lexical_scoping">lexical scope</a></strong>, as JavaScript did.</li>
+<li>Linear iteration is more efficient than linear recursion.
+
+<ul>
+<li>Use a step counter and a accumulator to transform a linear recursion to a linear iteration. Which is what C, Pascal and Java do in their looping constructs.</li>
+<li>Tail recursion made looping constructs a syntactic sugar.</li>
+</ul>
+</li>
+<li>Linear iteration could be converted to o(log) iteration</li>
+</ul>
+
+
+<h3>Exercises</h3>
+
+<h4>1.9</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nb">+ </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">a</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>      <span class="nv">b</span>
+</span><span class='line'>      <span class="p">(</span><span class="nf">inc</span> <span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nf">dec</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">b</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nb">+ </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">a</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>      <span class="nv">b</span>
+</span><span class='line'>      <span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nf">dec</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">inc</span> <span class="nv">b</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>First is recursive and second is iterative.</p>
+
+<h4>1.10</h4>
+
+<figure class='code'><figcaption><span>Ackermann&#8217;s function</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">A</span> <span class="nv">x</span> <span class="nv">y</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">cond </span><span class="p">((</span><span class="nb">= </span><span class="nv">y</span> <span class="mi">0</span><span class="p">)</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">((</span><span class="nb">= </span><span class="nv">x</span> <span class="mi">0</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="mi">2</span> <span class="nv">y</span><span class="p">))</span>
+</span><span class='line'>        <span class="p">((</span><span class="nb">= </span><span class="nv">y</span> <span class="mi">1</span><span class="p">)</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nf">A</span> <span class="p">(</span><span class="nb">- </span><span class="nv">x</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>                 <span class="p">(</span><span class="nf">A</span> <span class="nv">x</span> <span class="p">(</span><span class="nb">- </span><span class="nv">y</span> <span class="mi">1</span><span class="p">))))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>What&#8217;s the meaning of this?</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">f</span> <span class="nv">n</span><span class="p">)</span> <span class="p">(</span><span class="nf">A</span> <span class="mi">0</span> <span class="nv">n</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">g</span> <span class="nv">n</span><span class="p">)</span> <span class="p">(</span><span class="nf">A</span> <span class="mi">1</span> <span class="nv">n</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">h</span> <span class="nv">n</span><span class="p">)</span> <span class="p">(</span><span class="nf">A</span> <span class="mi">2</span> <span class="nv">n</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>Their plain scheme equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">f1</span> <span class="nv">n</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="mi">2</span> <span class="nv">n</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">g1</span> <span class="nv">n</span><span class="p">)</span> <span class="p">(</span><span class="nb">exp </span><span class="p">(</span><span class="nb">* </span><span class="p">(</span><span class="nb">log </span><span class="mi">2</span><span class="p">)</span> <span class="nv">n</span><span class="p">)))</span> <span class="c1">;; which is 2^n</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">h1</span> <span class="nv">n</span><span class="p">)</span> <span class="p">(</span><span class="nb">exp </span><span class="p">(</span><span class="nb">* </span><span class="p">(</span><span class="nb">log </span><span class="mi">2</span><span class="p">)</span> <span class="p">(</span><span class="nf">g1</span> <span class="nv">n</span><span class="p">))))</span> <span class="c1">;; which is wtf</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.11</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">f</span> <span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">f-iter</span> <span class="nv">t1</span> <span class="nv">t2</span> <span class="nv">t3</span> <span class="nv">i</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">= </span><span class="nv">i</span> <span class="mi">3</span><span class="p">)</span> <span class="nv">t3</span>
+</span><span class='line'>        <span class="p">(</span><span class="nf">f-iter</span> <span class="nv">t2</span> <span class="nv">t3</span>
+</span><span class='line'>                <span class="p">(</span><span class="nb">+ </span><span class="nv">t3</span> <span class="p">(</span><span class="nb">* </span><span class="mi">2</span> <span class="nv">t2</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="mi">3</span> <span class="nv">t1</span><span class="p">))</span>
+</span><span class='line'>                <span class="p">(</span><span class="nb">- </span><span class="nv">i</span> <span class="mi">1</span><span class="p">))))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">if</span>
+</span><span class='line'>   <span class="p">(</span><span class="nb">&lt; </span><span class="nv">n</span> <span class="mi">3</span><span class="p">)</span> <span class="nv">n</span>
+</span><span class='line'>   <span class="p">(</span><span class="nf">f-iter</span> <span class="mi">1</span> <span class="mi">2</span> <span class="mi">3</span> <span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.12</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="c1">;; p[1, 1] = 1</span>
+</span><span class='line'><span class="c1">;; p[n, 1] = 1</span>
+</span><span class='line'><span class="c1">;; p[n, n] = 1</span>
+</span><span class='line'><span class="c1">;; p[i, j] = p[i-1, j-1] + p[i-1, j]</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">pascal</span> <span class="nv">i</span> <span class="nv">j</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">cond</span>
+</span><span class='line'>    <span class="p">((</span><span class="nb">= </span><span class="nv">j</span> <span class="mi">1</span><span class="p">)</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">((</span><span class="nb">= </span><span class="nv">i</span> <span class="nv">j</span><span class="p">)</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nf">pascal</span> <span class="p">(</span><span class="nb">- </span><span class="nv">i</span> <span class="mi">1</span><span class="p">)</span> <span class="p">(</span><span class="nb">- </span><span class="nv">j</span> <span class="mi">1</span><span class="p">))</span> <span class="p">(</span><span class="nf">pascal</span> <span class="p">(</span><span class="nb">- </span><span class="nv">i</span> <span class="mi">1</span><span class="p">)</span> <span class="nv">j</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.13</h4>
+
+<p>I have proved it but I&rsquo;m tired of typing it again.</p>
+
+<h4>1.14</h4>
+
+<p>I have drawed it but I&rsquo;m tired of typing it again.</p>
+
+<h4>1.15</h4>
+
+<ol>
+<li>Five times</li>
+<li>o(round(a))</li>
+</ol>
+
+
+<h4>1.16</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">expt1</span> <span class="nv">b</span> <span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1">; invariant -&gt; result * coeff ^ power = b ^ n</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">iter</span> <span class="nv">coeff</span> <span class="nv">power</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">cond</span>
+</span><span class='line'>      <span class="p">((</span><span class="nb">= </span><span class="nv">power</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">((</span><span class="nb">= </span><span class="nv">power</span> <span class="mi">1</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">result</span> <span class="nv">coeff</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">((</span><span class="nb">even? </span><span class="nv">power</span><span class="p">)</span> <span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nb">* </span><span class="nv">coeff</span> <span class="nv">coeff</span><span class="p">)</span> <span class="p">(</span><span class="nb">/ </span><span class="nv">power</span> <span class="mi">2</span><span class="p">)</span> <span class="nv">result</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nb">* </span><span class="nv">coeff</span> <span class="nv">coeff</span><span class="p">)</span> <span class="p">(</span><span class="nb">/ </span><span class="p">(</span><span class="nb">- </span><span class="nv">power</span> <span class="mi">1</span><span class="p">)</span> <span class="mi">2</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">result</span> <span class="nv">coeff</span><span class="p">)))</span>
+</span><span class='line'>      <span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">iter</span> <span class="nv">b</span> <span class="nv">n</span> <span class="mi">1</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.17</h4>
+
+<figure class='code'><figcaption><span>recursive version</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">mul</span> <span class="nv">a</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">cond</span>
+</span><span class='line'>    <span class="p">((</span><span class="nb">= </span><span class="nv">b</span> <span class="mi">0</span><span class="p">)</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">((</span><span class="nb">= </span><span class="nv">a</span> <span class="mi">0</span><span class="p">)</span> <span class="mi">0</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">((</span><span class="nb">even? </span><span class="nv">b</span><span class="p">)</span> <span class="p">(</span><span class="nf">mul</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">a</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nb">/ </span><span class="nv">b</span> <span class="mi">2</span><span class="p">)))</span>
+</span><span class='line'>    <span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nb">+ </span><span class="nv">a</span> <span class="p">(</span><span class="nf">mul</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">a</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nb">/ </span><span class="p">(</span><span class="nb">- </span><span class="nv">b</span> <span class="mi">1</span><span class="p">)</span> <span class="mi">2</span><span class="p">))))</span>
+</span><span class='line'>    <span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.18</h4>
+
+<figure class='code'><figcaption><span>iterative</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">mul</span> <span class="nv">a</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'>  <span class="c1">; invaraint -&gt; result + num * times = a * b</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">iter</span> <span class="nv">num</span> <span class="nv">times</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'>    <span class="p">(</span><span class="nf">cond</span>
+</span><span class='line'>      <span class="p">((</span><span class="nb">= </span><span class="nv">times</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'>      <span class="p">((</span><span class="nb">= </span><span class="nv">times</span> <span class="mi">1</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">result</span> <span class="nv">num</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">((</span><span class="nb">even? </span><span class="nv">times</span><span class="p">)</span> <span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">num</span> <span class="nv">num</span><span class="p">)</span> <span class="p">(</span><span class="nb">/ </span><span class="nv">times</span> <span class="mi">2</span><span class="p">)</span> <span class="nv">result</span><span class="p">))</span>
+</span><span class='line'>      <span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">num</span> <span class="nv">num</span><span class="p">)</span> <span class="p">(</span><span class="nb">/ </span><span class="p">(</span><span class="nb">- </span><span class="nv">times</span> <span class="mi">1</span><span class="p">)</span> <span class="mi">2</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">result</span> <span class="nv">num</span><span class="p">)))</span>
+</span><span class='line'>      <span class="p">))</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">b</span> <span class="mi">0</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.19</h4>
+
+<p>It looks weird, but it&rsquo;s a matrix multiplication essentially.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="n">p_</span> <span class="o">=</span> <span class="n">p</span><span class="o">^</span><span class="mi">2</span> <span class="o">+</span> <span class="n">q</span><span class="o">^</span><span class="mi">2</span>
+</span><span class='line'><span class="n">q_</span> <span class="o">=</span> <span class="n">q</span><span class="o">^</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">p</span> <span class="o">*</span> <span class="n">q</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>complete fast fibonacci code</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">fib</span> <span class="nv">n</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="nf">fib-iter</span> <span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span> <span class="nv">n</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">fib-iter</span> <span class="nv">a</span> <span class="nv">b</span> <span class="nv">p</span> <span class="nv">q</span> <span class="nv">count</span><span class="p">)</span>
+</span><span class='line'>  <span class="p">(</span><span class="k">cond </span><span class="p">((</span><span class="nb">= </span><span class="nv">count</span> <span class="mi">0</span><span class="p">)</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'>        <span class="p">((</span><span class="nb">even? </span><span class="nv">count</span><span class="p">)</span>
+</span><span class='line'>         <span class="p">(</span><span class="nf">fib-iter</span> <span class="nv">a</span>
+</span><span class='line'>                   <span class="nv">b</span>
+</span><span class='line'>                   <span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nb">* </span><span class="nv">p</span> <span class="nv">p</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">q</span> <span class="nv">q</span><span class="p">))</span>    <span class="c1">; compute p&#39;</span>
+</span><span class='line'>                   <span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nb">* </span><span class="nv">q</span> <span class="nv">q</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="mi">2</span> <span class="nv">p</span> <span class="nv">q</span><span class="p">))</span>  <span class="c1">; compute q&#39;</span>
+</span><span class='line'>                   <span class="p">(</span><span class="nb">/ </span><span class="nv">count</span> <span class="mi">2</span><span class="p">)))</span>
+</span><span class='line'>        <span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nf">fib-iter</span> <span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nb">* </span><span class="nv">b</span> <span class="nv">q</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">a</span> <span class="nv">q</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">a</span> <span class="nv">p</span><span class="p">))</span>
+</span><span class='line'>                        <span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nb">* </span><span class="nv">b</span> <span class="nv">p</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">a</span> <span class="nv">q</span><span class="p">))</span>
+</span><span class='line'>                        <span class="nv">p</span>
+</span><span class='line'>                        <span class="nv">q</span>
+</span><span class='line'>                        <span class="p">(</span><span class="nb">- </span><span class="nv">count</span> <span class="mi">1</span><span class="p">)))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -1386,6 +1694,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/on-reading-sicp-02/">On Reading SICP (02)</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/on-reading-sicp-01/">On Reading SICP (01)</a>
       </li>
     
@@ -1401,7 +1713,7 @@
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/blog/categories/c-'>C# (1)</a></li><li><a href='/blog/categories/java'>Java (1)</a></li><li><a href='/blog/categories/programming'>Programming (2)</a></li><li><a href='/blog/categories/reading'>Reading (1)</a></li><li><a href='/blog/categories/scheme'>Scheme (1)</a></li><li><a href='/blog/categories/sicp'>SICP (1)</a></li></ul>
+    <ul id="category-list"><li><a href='/blog/categories/c-'>C# (1)</a></li><li><a href='/blog/categories/java'>Java (1)</a></li><li><a href='/blog/categories/programming'>Programming (3)</a></li><li><a href='/blog/categories/reading'>Reading (2)</a></li><li><a href='/blog/categories/scheme'>Scheme (2)</a></li><li><a href='/blog/categories/sicp'>SICP (2)</a></li></ul>
 </section>
   
 </aside>

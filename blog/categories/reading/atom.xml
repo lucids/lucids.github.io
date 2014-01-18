@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Reading | Lucids]]></title>
   <link href="http://lucids.github.io/blog/categories/reading/atom.xml" rel="self"/>
   <link href="http://lucids.github.io/"/>
-  <updated>2014-01-12T23:56:29+00:00</updated>
+  <updated>2014-01-18T23:47:36+00:00</updated>
   <id>http://lucids.github.io/</id>
   <author>
     <name><![CDATA[Lucids]]></name>
@@ -12,6 +12,218 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[On Reading SICP (02)]]></title>
+    <link href="http://lucids.github.io/blog/on-reading-sicp-02/"/>
+    <updated>2014-01-18T23:46:53+00:00</updated>
+    <id>http://lucids.github.io/blog/on-reading-sicp-02</id>
+    <content type="html"><![CDATA[<h3>About</h3>
+
+<p>From page 26 to page 47</p>
+
+<h3>Notes</h3>
+
+<ul>
+<li>Scheme use <strong><a href="http://en.wikipedia.org/wiki/Lexical_scoping">lexical scope</a></strong>, as JavaScript did.</li>
+<li>Linear iteration is more efficient than linear recursion.
+
+<ul>
+<li>Use a step counter and a accumulator to transform a linear recursion to a linear iteration. Which is what C, Pascal and Java do in their looping constructs.</li>
+<li>Tail recursion made looping constructs a syntactic sugar.</li>
+</ul>
+</li>
+<li>Linear iteration could be converted to o(log) iteration</li>
+</ul>
+
+
+<h3>Exercises</h3>
+
+<h4>1.9</h4>
+
+<p>```scm
+(define (+ a b)
+  (if (= a 0)</p>
+
+<pre><code>  b
+  (inc (+ (dec a) b))))
+</code></pre>
+
+<p>(define (+ a b)
+  (if (= a 0)</p>
+
+<pre><code>  b
+  (+ (dec a) (inc b))))
+</code></pre>
+
+<p>```</p>
+
+<p>First is recursive and second is iterative.</p>
+
+<h4>1.10</h4>
+
+<p>```scm Ackermann&rsquo;s function
+(define (A x y)
+  (cond ((= y 0) 0)</p>
+
+<pre><code>    ((= x 0) (* 2 y))
+    ((= y 1) 2)
+    (else (A (- x 1)
+             (A x (- y 1))))))
+</code></pre>
+
+<p>```</p>
+
+<p><code>scm What's the meaning of this?
+(define (f n) (A 0 n))
+(define (g n) (A 1 n))
+(define (h n) (A 2 n))
+</code></p>
+
+<p><code>scm Their plain scheme equivalent
+(define (f1 n) (* 2 n))
+(define (g1 n) (exp (* (log 2) n))) ;; which is 2^n
+(define (h1 n) (exp (* (log 2) (g1 n)))) ;; which is wtf
+</code></p>
+
+<h4>1.11</h4>
+
+<p>```scm
+(define (f n)
+  (define (f-iter t1 t2 t3 i)</p>
+
+<pre><code>(if (= i 3) t3
+    (f-iter t2 t3 
+            (+ t3 (* 2 t2) (* 3 t1))
+            (- i 1))))
+</code></pre>
+
+<p>  (if
+   (&lt; n 3) n
+   (f-iter 1 2 3 n)</p>
+
+<pre><code>))
+</code></pre>
+
+<p>```</p>
+
+<h4>1.12</h4>
+
+<p>```scm
+;; p[1, 1] = 1
+;; p[n, 1] = 1
+;; p[n, n] = 1
+;; p[i, j] = p[i-1, j-1] + p[i-1, j]</p>
+
+<p>(define (pascal i j)
+  (cond</p>
+
+<pre><code>((= j 1) 1)
+((= i j) 1)
+(else (+ (pascal (- i 1) (- j 1)) (pascal (- i 1) j)))
+))
+</code></pre>
+
+<p>```</p>
+
+<h4>1.13</h4>
+
+<p>I have proved it but I&rsquo;m tired of typing it again.</p>
+
+<h4>1.14</h4>
+
+<p>I have drawed it but I&rsquo;m tired of typing it again.</p>
+
+<h4>1.15</h4>
+
+<ol>
+<li>Five times</li>
+<li>o(round(a))</li>
+</ol>
+
+
+<h4>1.16</h4>
+
+<p>```scm
+(define (expt1 b n)
+  ; invariant &ndash;> result * coeff ^ power = b ^ n
+  (define (iter coeff power result)</p>
+
+<pre><code>(cond
+  ((= power 0) result)
+  ((= power 1) (* result coeff))
+  ((even? power) (iter (* coeff coeff) (/ power 2) result))
+  (else (iter (* coeff coeff) (/ (- power 1) 2) (* result coeff)))
+  ))
+</code></pre>
+
+<p>  (iter b n 1))
+```</p>
+
+<h4>1.17</h4>
+
+<p>```scm recursive version
+(define (mul a b)
+  (cond</p>
+
+<pre><code>((= b 0) 0)
+((= a 0) 0)
+((even? b) (mul (+ a a) (/ b 2)))
+(else (+ a (mul (+ a a) (/ (- b 1) 2))))
+))
+</code></pre>
+
+<p>```</p>
+
+<h4>1.18</h4>
+
+<p>```scm iterative
+(define (mul a b)
+  ; invaraint &ndash;> result + num * times = a * b
+  (define (iter num times result)</p>
+
+<pre><code>(cond
+  ((= times 0) result)
+  ((= times 1) (+ result num))
+  ((even? times) (iter (+ num num) (/ times 2) result))
+  (else (iter (+ num num) (/ (- times 1) 2) (+ result num)))
+  ))
+</code></pre>
+
+<p>  (iter a b 0))
+```</p>
+
+<h4>1.19</h4>
+
+<p>It looks weird, but it&rsquo;s a matrix multiplication essentially.</p>
+
+<p><code>python
+p_ = p^2 + q^2
+q_ = q^2 + 2 * p * q
+</code></p>
+
+<p>```scm complete fast fibonacci code
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)</p>
+
+<pre><code>    ((even? count)
+     (fib-iter a
+               b
+               (+ (* p p) (* q q))    ; compute p'
+               (+ (* q q) (* 2 p q))  ; compute q'
+               (/ count 2)))
+    (else (fib-iter (+ (* b q) (* a q) (* a p))
+                    (+ (* b p) (* a q))
+                    p
+                    q
+                    (- count 1)))))
+</code></pre>
+
+<p>```</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[On Reading SICP (01)]]></title>
