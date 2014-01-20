@@ -4,7 +4,7 @@
   <title><![CDATA[Category: SICP | Lucids]]></title>
   <link href="http://lucids.github.io/blog/categories/sicp/atom.xml" rel="self"/>
   <link href="http://lucids.github.io/"/>
-  <updated>2014-01-18T23:47:36+00:00</updated>
+  <updated>2014-01-20T23:46:39+00:00</updated>
   <id>http://lucids.github.io/</id>
   <author>
     <name><![CDATA[Lucids]]></name>
@@ -12,6 +12,318 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[On Reading SICP (03)]]></title>
+    <link href="http://lucids.github.io/blog/on-reading-sicp-03/"/>
+    <updated>2014-01-20T23:45:15+00:00</updated>
+    <id>http://lucids.github.io/blog/on-reading-sicp-03</id>
+    <content type="html"><![CDATA[<p>On Reading SICP (03)</p>
+
+<h3>About</h3>
+
+<p>From page 48 to page 56.</p>
+
+<p>From exercise 1.19 to exercise 1.28.</p>
+
+<h3>Notes</h3>
+
+<p>This part is a little boring, since I don&rsquo;t like fiddling with numbers.</p>
+
+<p>I wrote exercise solutions in <a href="http://racket-lang.org/">DrRacket</a>, then I found some functions missing(like <code>runtime</code>), fortunately there is a SICP-specific racket package called <a href="http://www.neilvandyke.org/racket-sicp/">Racket Sicp</a>, many thanks to PLaneT.</p>
+
+<h3>Exercises</h3>
+
+<h4>1.20</h4>
+
+<p>```scm
+(define (gcd a b)
+  (if (= b 0)</p>
+
+<pre><code>a
+(gcd b (remainder a b))))
+</code></pre>
+
+<p>```</p>
+
+<p>Normal-order evaluation won&rsquo;t fully unwarp expression until all operation become primitive, so <code>remainder</code> will be called mannnnnny times.</p>
+
+<p>```scm (gcd 206 40)
+; normal-order evaluation
+(gcd 206 40)
+(gcd 40 (remainder 206 40))
+(gcd (remainder 206 40) (remainder 40 (remainder 206 40)))
+(gcd (remainder 40 (remainder 206 40)) (remainder (remainder 206 40) (remainder 40 (remainder 206 40))))
+(gcd (remainder (remainder 206 40) (remainder 40 (remainder 206 40))) (remainder (remainder 40 (remainder 206 40)) (remainder (remainder 206 40) (remainder 40 (remainder 206 40)))))
+(gcd 2 0)
+2</p>
+
+<p>; applicative-order evaluation
+(gcd 206 40)
+(gcd 40 6)
+(gcd 6 4)
+(gcd 4 2)
+(gcd 2 0)
+2
+```</p>
+
+<h4>1.21</h4>
+
+<p>```scm</p>
+
+<blockquote><p>(smallest-divisor 19)
+19
+(smallest-divisor 199)
+199
+(smallest-divisor 1999)
+1999
+; which give me an illusion that all 199..9 are primes, but&hellip;
+(smallest-divisor 19999)
+7
+; never trust your intutions, especially on maths.
+```</p></blockquote>
+
+<h4>1.22</h4>
+
+<p>```scm
+(define (search-for-primes n)
+  (define (next-odd n) (if (odd? n) (+ n 2) (+ n 1)))
+  (define (iter n rest start-time)</p>
+
+<pre><code>(cond ((= rest 0) 
+       (newline)
+       (display (- (runtime) start-time)))
+      ((prime? n)  (newline)
+                   (display n)
+                   (iter (next-odd n) (- rest 1) start-time))
+      (else (iter (next-odd n) rest start-time))
+    )
+)
+</code></pre>
+
+<p>  (iter n 3 (runtime)))
+```</p>
+
+<p>Result quite not support prediction, seems large number would have more overhead.</p>
+
+<p>```scm result</p>
+
+<blockquote><p>(search-for-primes 1000)
+1009
+1013
+1019
+5000
+(search-for-primes 100000)
+100003
+100019
+100043
+7000
+(search-for-primes 1000000)
+1000003
+1000033
+1000037
+9000
+(search-for-primes 10000000)
+10000019
+10000079
+10000103
+15000
+(search-for-primes 100000000)
+100000007
+100000037
+100000039
+24000
+```</p></blockquote>
+
+<h4>1.23</h4>
+
+<p>Strange result. It&rsquo;s</p>
+
+<p>```scm</p>
+
+<blockquote><p>(search-for-primes 1000)
+1009
+1013
+1019
+5000
+(search-for-primes 10000)
+10007
+10009
+10037
+5000
+(search-for-primes 100000)
+100003
+100019
+100043
+9000
+(search-for-primes 10000000)
+10000019
+10000079
+10000103
+36000
+(search-for-primes 100000000)
+100000007
+100000037
+100000039
+21000
+```</p></blockquote>
+
+<h4>1.24</h4>
+
+<p>This would decrease the running time, as the experiment result shows.</p>
+
+<p>```scm</p>
+
+<blockquote><p>(search-for-primes 1000)
+1009
+1013
+1019
+5000
+(search-for-primes 10000)
+10007
+10009
+10037
+5000
+(search-for-primes 100000)
+100003
+100019
+100043
+8000
+(search-for-primes 1000000)
+1000003
+1000033
+1000037
+8000
+(search-for-primes 10000000)
+10000019
+10000079
+10000103
+9000
+(search-for-primes 100000000)
+100000007
+100000037
+100000039
+9000
+```</p></blockquote>
+
+<h4>1.25</h4>
+
+<p><code>fast-expt</code>  would generate a very big number when exp are big, arbitrary precision number multiplication cost more time than small number remaindering.</p>
+
+<p><code>scm
+(define (expmod base exp m)
+  (remainder (fast-expt base exp) m))
+</code></p>
+
+<h4>1.26</h4>
+
+<p>```scm
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)</p>
+
+<pre><code>    ((even? exp)
+     (remainder (* (expmod base (/ exp 2) m)
+                   (expmod base (/ exp 2) m))
+                m))
+    (else
+     (remainder (* base (expmod base (- exp 1) m))
+                m))))
+</code></pre>
+
+<p>```</p>
+
+<p><code>remainder</code> calls <code>expmod</code> recursively twice, which make s a o(log(n)) recursion to a 2<sup>0</sup> * log(2<sup>0</sup>) + 2<sup>1</sup> * log(2<sup>1</sup>) + 2<sup>2</sup> * log(2<sup>2</sup>) &hellip; which is o(n).</p>
+
+<h4>1.27</h4>
+
+<p>```scm code
+(define (carmichael-test n)
+  (define (iter n a)</p>
+
+<pre><code>(cond ((= a 0) true)
+      ((= (expmod a n n) a) (iter n (- a 1)))
+      (else false))
+</code></pre>
+
+<p>```</p>
+
+<p>```scm result</p>
+
+<blockquote><p>(carmichael-test 2)</p>
+
+<h1>t</h1>
+
+<p>(carmichael-test 3)</p>
+
+<h1>t</h1>
+
+<p>(carmichael-test 10)</p>
+
+<h1>f</h1>
+
+<p>(carmichael-test 561)</p>
+
+<h1>t</h1>
+
+<p>(carmichael-test 6601)</p>
+
+<h1>t</h1>
+
+<p>```</p></blockquote>
+
+<h4>1.28</h4>
+
+<p>```scm Miller-Rabin test
+(define (expmod base exp m)
+  (cond ((= exp 0) 1)</p>
+
+<pre><code>    ((and
+      (not (= base 1))
+      (not (= base (- m 1)))
+      (= (remainder (* base base) m) 1))
+     0)
+    ((even? exp)
+     (remainder (square (expmod base (/ exp 2) m))
+                m))
+    (else
+     (remainder (* base (expmod base (- exp 1) m))
+                m))))
+</code></pre>
+
+<p>(define (miller-rabin-test n)
+  (define (try-it a)</p>
+
+<pre><code>(= (expmod a (- n 1) n) 1))
+</code></pre>
+
+<p>  (try-it (+ 1 (random (&ndash; n 1)))))
+```</p>
+
+<p>```scm sample output</p>
+
+<blockquote><p>(miller-rabin-test 561)</p>
+
+<h1>f</h1>
+
+<p>(miller-rabin-test 3)</p>
+
+<h1>t</h1>
+
+<p>(miller-rabin-test 7)</p>
+
+<h1>t</h1>
+
+<p>(miller-rabin-test 8)</p>
+
+<h1>f</h1>
+
+<p>(miller-rabin-test 6601)</p>
+
+<h1>t</h1>
+
+<p>```</p></blockquote>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[On Reading SICP (02)]]></title>
