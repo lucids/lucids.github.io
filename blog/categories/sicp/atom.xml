@@ -4,7 +4,7 @@
   <title><![CDATA[Category: SICP | Lucids]]></title>
   <link href="http://lucids.github.io/blog/categories/sicp/atom.xml" rel="self"/>
   <link href="http://lucids.github.io/"/>
-  <updated>2014-02-15T21:31:18+00:00</updated>
+  <updated>2014-02-15T21:35:18+00:00</updated>
   <id>http://lucids.github.io/</id>
   <author>
     <name><![CDATA[Lucids]]></name>
@@ -44,9 +44,6 @@ exp1
 exp2
 ...
 expn)
-</code></p>
-
-<p><code>scm lambda equivalent
 </code></p>
 
 <h3>Exercises</h3>

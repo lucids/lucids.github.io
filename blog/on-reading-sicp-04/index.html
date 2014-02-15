@@ -134,102 +134,123 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
+<h3>Exercises</h3>
 
+<h4>1.29</h4>
 
-<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p>In order to reuse <code>sum</code>, I define <code>fk</code>, which may be a little weird.</p>
+
+<figure class='code'><figcaption><span>program</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">```</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">sum</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="mi">0</span>
+</span><span class='line'><span class="p">(</span><span class="nb">+ </span><span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nf">sum</span> <span class="nv">term</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">))))</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">###</span> <span class="nv">Exercises</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">square</span> <span class="nv">x</span><span class="p">)(</span><span class="nb">* </span><span class="nv">x</span> <span class="nv">x</span><span class="p">))</span>
 </span><span class='line'>
-</span><span class='line'><span class="o">####</span> <span class="mf">1.29</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">integral</span> <span class="nv">f</span> <span class="nv">a</span> <span class="nv">b</span> <span class="nv">dx</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">add-dx</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="nv">dx</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="nb">* </span><span class="p">(</span><span class="nf">sum</span> <span class="nv">f</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">a</span> <span class="p">(</span><span class="nb">/ </span><span class="nv">dx</span> <span class="mf">2.0</span><span class="p">))</span> <span class="nv">add-dx</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">dx</span><span class="p">))</span>
 </span><span class='line'>
-</span><span class='line'><span class="nv">In</span> <span class="nv">order</span> <span class="nv">to</span> <span class="nv">reuse</span> <span class="o">`</span><span class="nv">sum</span><span class="o">`,</span> <span class="nv">I</span> <span class="k">define </span><span class="o">`</span><span class="nv">fk</span><span class="o">`,</span> <span class="nv">which</span> <span class="nv">may</span> <span class="nv">be</span> <span class="nv">a</span> <span class="nv">little</span> <span class="nv">weird</span><span class="o">.</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">simpson-integral</span> <span class="nv">f</span> <span class="nv">a</span> <span class="nv">b</span> <span class="nv">n</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">let </span><span class="p">((</span><span class="nf">h</span> <span class="p">(</span><span class="nb">/ </span><span class="p">(</span><span class="nb">- </span><span class="nv">b</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">n</span><span class="p">)))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">yk</span> <span class="nv">k</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">a</span> <span class="p">(</span><span class="nb">* </span><span class="nv">k</span> <span class="nv">h</span><span class="p">)))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">inc</span> <span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">fk</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nf">cond</span>
+</span><span class='line'><span class="p">((</span><span class="nb">= </span><span class="nv">x</span> <span class="mi">0</span><span class="p">)</span> <span class="p">(</span><span class="nf">f</span> <span class="nv">a</span><span class="p">))</span>
+</span><span class='line'><span class="p">((</span><span class="nb">= </span><span class="nv">x</span> <span class="nv">n</span><span class="p">)</span> <span class="p">(</span><span class="nf">f</span> <span class="nv">b</span><span class="p">))</span>
+</span><span class='line'><span class="p">((</span><span class="nb">even? </span><span class="nv">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="mi">2</span> <span class="p">(</span><span class="nf">f</span> <span class="p">(</span><span class="nf">yk</span> <span class="nv">x</span><span class="p">))))</span>
+</span><span class='line'><span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nb">* </span><span class="mi">4</span> <span class="p">(</span><span class="nf">f</span> <span class="p">(</span><span class="nf">yk</span> <span class="nv">x</span><span class="p">))))))</span>
+</span><span class='line'><span class="p">(</span><span class="nb">* </span><span class="p">(</span><span class="nf">sum</span> <span class="nv">fk</span> <span class="mi">0</span> <span class="nv">inc</span> <span class="nv">n</span><span class="p">)</span> <span class="p">(</span><span class="nb">/ </span><span class="p">(</span><span class="nb">- </span><span class="nv">b</span> <span class="nv">a</span><span class="p">)</span> <span class="mf">3.0</span> <span class="nv">n</span><span class="p">))</span>
+</span><span class='line'><span class="p">))</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>scm program
-(define (sum term a next b)
-(if (> a b)
-0
-(+ (term a)
-(sum term (next a) next b))))</p>
+<p>It`s more precise indeed, wow!</p>
 
-<p>(define (square x)(* x x))</p>
-
-<p>(define (integral f a b dx)
-(define (add-dx x) (+ x dx))
-(* (sum f (+ a (/ dx 2.0)) add-dx b) dx))</p>
-
-<p>(define (simpson-integral f a b n)
-(let ((h (/ (&ndash; b a) n)))
-(define (yk k) (+ a (<em> k h)))
-(define (inc x) (+ x 1))
-(define (fk x)
-(cond
-((= x 0) (f a))
-((= x n) (f b))
-((even? x) (</em> 2 (f (yk x))))
-(else (<em> 4 (f (yk x))))))
-(</em> (sum fk 0 inc n) (/ (&ndash; b a) 3.0 n))
-))</p>
-
-<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">It</span><span class="o">`</span><span class="nv">s</span> <span class="nv">more</span> <span class="nv">precise</span> <span class="nv">indeed,</span> <span class="nv">wow!</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>scm comparison</p>
-
-<blockquote><p>(simpson-integral square 0 1 100)
-0.3333333333333333
-(integral square 0 1 0.01)
-0.33332500000000054</p></blockquote>
-
-<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">####</span> <span class="mf">1.30</span>
-</span></code></pre></td></tr></table></div></figure>
-
-
-<p>scm
-(define (sum term a next b)
-(define (iter a result)
-(if (> a b) result
-(iter (next a) (+ result (term a)))))
-(iter a 0))</p>
-
-<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>comparison</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
-</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">####</span> <span class="mf">1.31</span>
-</span><span class='line'>
-</span><span class='line'><span class="nv">It</span> <span class="nv">can</span> <span class="nv">be</span> <span class="nv">generated</span> <span class="nv">by</span> <span class="o">`</span><span class="nv">s/+/*/</span> <span class="nv">s/0/1/</span> <span class="nv">s/sum/prod/</span><span class="o">`.</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">simpson-integral</span> <span class="nv">square</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mi">100</span><span class="p">)</span>
+</span><span class='line'><span class="mf">0.3333333333333333</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">integral</span> <span class="nv">square</span> <span class="mi">0</span> <span class="mi">1</span> <span class="mf">0.01</span><span class="p">)</span>
+</span><span class='line'><span class="mf">0.33332500000000054</span>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>scm
-(define (prod-rec term a next b)
-(if (> a b) 1
-(* (term a) (prod-rec term (next a) next b))))</p>
+<h4>1.30</h4>
 
-<p>(define (prod-iter term a next b)
-(define (iter a result)
-(if (> a b) result
-(iter (next a) (* result (term a)))))
-(iter a 1))</p>
-
-<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
-</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">```</span><span class="nv">scm</span> <span class="nv">sample</span> <span class="nv">output</span>
-</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-rec</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">5</span><span class="p">)</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">sum</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">result</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">result</span> <span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)))))</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="mi">0</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.31</h4>
+
+<p>It can be generated by <code>s/+/*/ s/0/1/ s/sum/prod/</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">prod-rec</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="mi">1</span>
+</span><span class='line'><span class="p">(</span><span class="nb">* </span><span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">prod-rec</span> <span class="nv">term</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">prod-iter</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">result</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">result</span> <span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)))))</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="mi">1</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sample output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-rec</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">5</span><span class="p">)</span>
 </span><span class='line'><span class="mi">120</span>
 </span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-iter</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">5</span><span class="p">)</span>
 </span><span class='line'><span class="mi">120</span>
