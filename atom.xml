@@ -4,7 +4,7 @@
   <title><![CDATA[Lucids]]></title>
   <link href="http://lucids.github.io/atom.xml" rel="self"/>
   <link href="http://lucids.github.io/"/>
-  <updated>2014-01-20T23:46:39+00:00</updated>
+  <updated>2014-02-15T21:31:18+00:00</updated>
   <id>http://lucids.github.io/</id>
   <author>
     <name><![CDATA[Lucids]]></name>
@@ -12,6 +12,289 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[On Reading SICP (04)]]></title>
+    <link href="http://lucids.github.io/blog/on-reading-sicp-04/"/>
+    <updated>2014-02-15T21:28:07+00:00</updated>
+    <id>http://lucids.github.io/blog/on-reading-sicp-04</id>
+    <content type="html"><![CDATA[<p>On Reading SICP (04)</p>
+
+<h3>About</h3>
+
+<p>From page 48 to page 66.</p>
+
+<p>From exercise 1.29 to exercise 1.34.</p>
+
+<h3>Notes</h3>
+
+<p>I like this section, the notion of <code>accumulation</code> and <code>filter</code> is introduced, which are my favourite functional programming tools.</p>
+
+<p>Also, the idea, that <code>let</code> is syntactical sugar of <code>lambda</code>, is pretty interesting.</p>
+
+<figure class='code'><figcaption><span>let and lambda</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">let </span><span class="p">((</span><span class="nf">var1</span> <span class="nv">exp1</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nf">var2</span> <span class="nv">exp2</span><span class="p">)</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="p">(</span><span class="nf">varn</span> <span class="nv">expn</span><span class="p">))</span>
+</span><span class='line'><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'><span class="c1">; is the equivalent of</span>
+</span><span class='line'><span class="p">((</span><span class="k">lambda </span><span class="p">(</span><span class="nf">var1</span> <span class="nv">var2</span> <span class="o">...</span> <span class="nv">varn</span><span class="p">)</span> <span class="nv">body</span><span class="p">)</span>
+</span><span class='line'><span class="nv">exp1</span>
+</span><span class='line'><span class="nv">exp2</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="nv">expn</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">```</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">###</span> <span class="nv">Exercises</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">####</span> <span class="mf">1.29</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">In</span> <span class="nv">order</span> <span class="nv">to</span> <span class="nv">reuse</span> <span class="o">`</span><span class="nv">sum</span><span class="o">`,</span> <span class="nv">I</span> <span class="k">define </span><span class="o">`</span><span class="nv">fk</span><span class="o">`,</span> <span class="nv">which</span> <span class="nv">may</span> <span class="nv">be</span> <span class="nv">a</span> <span class="nv">little</span> <span class="nv">weird</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>scm program
+(define (sum term a next b)
+(if (> a b)
+0
+(+ (term a)
+(sum term (next a) next b))))</p>
+
+<p>(define (square x)(* x x))</p>
+
+<p>(define (integral f a b dx)
+(define (add-dx x) (+ x dx))
+(* (sum f (+ a (/ dx 2.0)) add-dx b) dx))</p>
+
+<p>(define (simpson-integral f a b n)
+(let ((h (/ (&ndash; b a) n)))
+(define (yk k) (+ a (<em> k h)))
+(define (inc x) (+ x 1))
+(define (fk x)
+(cond
+((= x 0) (f a))
+((= x n) (f b))
+((even? x) (</em> 2 (f (yk x))))
+(else (<em> 4 (f (yk x))))))
+(</em> (sum fk 0 inc n) (/ (&ndash; b a) 3.0 n))
+))</p>
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">It</span><span class="o">`</span><span class="nv">s</span> <span class="nv">more</span> <span class="nv">precise</span> <span class="nv">indeed,</span> <span class="nv">wow!</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>scm comparison</p>
+
+<blockquote><p>(simpson-integral square 0 1 100)
+0.3333333333333333
+(integral square 0 1 0.01)
+0.33332500000000054</p></blockquote>
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">####</span> <span class="mf">1.30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>scm
+(define (sum term a next b)
+(define (iter a result)
+(if (> a b) result
+(iter (next a) (+ result (term a)))))
+(iter a 0))</p>
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">####</span> <span class="mf">1.31</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">It</span> <span class="nv">can</span> <span class="nv">be</span> <span class="nv">generated</span> <span class="nv">by</span> <span class="o">`</span><span class="nv">s/+/*/</span> <span class="nv">s/0/1/</span> <span class="nv">s/sum/prod/</span><span class="o">`.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>scm
+(define (prod-rec term a next b)
+(if (> a b) 1
+(* (term a) (prod-rec term (next a) next b))))</p>
+
+<p>(define (prod-iter term a next b)
+(define (iter a result)
+(if (> a b) result
+(iter (next a) (* result (term a)))))
+(iter a 1))</p>
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">```</span><span class="nv">scm</span> <span class="nv">sample</span> <span class="nv">output</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-rec</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">5</span><span class="p">)</span>
+</span><span class='line'><span class="mi">120</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-iter</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">5</span><span class="p">)</span>
+</span><span class='line'><span class="mi">120</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.32</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">accum-rec</span> <span class="nv">op</span> <span class="nv">init</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">init</span>
+</span><span class='line'><span class="p">(</span><span class="nf">op</span> <span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">accum-rec</span> <span class="nv">op</span> <span class="nv">init</span> <span class="nv">term</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">accum-iter</span> <span class="nv">op</span> <span class="nv">init</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">result</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">op</span> <span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">result</span><span class="p">))))</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">init</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sample output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">accum-rec</span> <span class="nv">+</span> <span class="mi">0</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="mi">1</span> <span class="nv">x</span><span class="p">))</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'><span class="mi">55</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">accum-iter</span> <span class="nv">+</span> <span class="mi">0</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="mi">1</span> <span class="nv">x</span><span class="p">))</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'><span class="mi">55</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.33</h4>
+
+<p>Finally I don`t have to write recursive and iterative version at once.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">filtered-accum</span> <span class="nv">op</span> <span class="nv">init</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span> <span class="nv">filter</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">cond </span><span class="p">((</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'><span class="p">((</span><span class="nf">filter</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">op</span> <span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">result</span><span class="p">)))</span>
+</span><span class='line'><span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">result</span><span class="p">))))</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">init</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sample output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">filtered-accum</span> <span class="nv">+</span> <span class="mi">0</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">10</span> <span class="nv">even?</span><span class="p">)</span>
+</span><span class='line'><span class="mi">30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sum of the squares of the prime numbers in the interval a to b</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">sum-prime-squares</span> <span class="nv">a</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nf">filtered-accum</span>
+</span><span class='line'><span class="nv">+</span> <span class="mi">0</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">x</span> <span class="nv">x</span><span class="p">))</span> <span class="nv">a</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="nv">b</span> <span class="nv">prime?</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>product of all positive integers i < n such that GCD(i, n) = 1</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">prod-relative-primes-less-than</span> <span class="nv">n</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nf">filtered-accum</span>
+</span><span class='line'><span class="nv">*</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'><span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="p">(</span><span class="nb">- </span><span class="nv">n</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">= </span><span class="p">(</span><span class="nb">gcd </span><span class="nv">x</span> <span class="nv">n</span><span class="p">)</span> <span class="mi">1</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sample output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">sum-prime-squares</span> <span class="mi">1</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'><span class="mi">87</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-relative-primes-less-than</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'><span class="mi">189</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.34</h4>
+
+<p>Given</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">f</span> <span class="nv">g</span><span class="p">)</span> <span class="p">(</span><span class="nf">g</span> <span class="mi">2</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>which <code>f</code> would receive a function <code>g</code> then return the result that apply <code>g</code> with <code>2</code>.</p>
+
+<p>Since scheme uses applicative-order evaluation, I think <code>(f f)</code> would become <code>(f 2)</code> then <code>(2 2)</code>, since <code>2</code> is a number instead of a function, it would pop up an error here.</p>
+
+<p>Then my thought was proved :)</p>
+
+<figure class='code'><figcaption><span>experiment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">f</span> <span class="nv">g</span><span class="p">)</span> <span class="p">(</span><span class="nf">g</span> <span class="mi">2</span><span class="p">))</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">f</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'><span class="o">.</span> <span class="o">.</span> <span class="nv">application:</span> <span class="nv">not</span> <span class="nv">a</span> <span class="nv">procedure</span><span class="c1">;</span>
+</span><span class='line'><span class="nv">expected</span> <span class="nv">a</span> <span class="nv">procedure</span> <span class="nv">that</span> <span class="nv">can</span> <span class="nv">be</span> <span class="nv">applied</span> <span class="nv">to</span> <span class="nv">arguments</span>
+</span><span class='line'><span class="nv">given:</span> <span class="mi">2</span>
+</span><span class='line'><span class="nv">arguments</span><span class="o">...</span><span class="nv">:</span>
+</span><span class='line'><span class="mi">2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[On Reading SICP (03)]]></title>

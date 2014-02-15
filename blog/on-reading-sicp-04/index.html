@@ -1,0 +1,536 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>On Reading SICP (04) - Lucids</title>
+  <meta name="author" content="Lucids">
+
+  
+  <meta name="description" content="on reading SICP">
+  <meta name="keywords" content="SICP, Scheme, Programming">
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://lucids.github.io/blog/on-reading-sicp-04">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <link href="/atom.xml" rel="alternate" title="Lucids" type="application/atom+xml">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script>!window.jQuery && document.write(unescape('%3Cscript src="./javascripts/libs/jquery.min.js"%3E%3C/script%3E'))</script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+  <h1><a href="/">Lucids</a></h1>
+  
+    <h2>Life Love Tech</h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="http://www.duckduckgo.com/" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="sites" value="lucids.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search&hellip;"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+  <li><a href="http://zh.lucida.me">Chinese</a></li>
+  <li><a href="/about">About</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">On Reading SICP (04)</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-15T21:28:07+00:00" pubdate data-updated="true">Feb 15<span>th</span>, 2014</time>
+        
+           | <a href="#disqus_thread"
+             data-disqus-identifier="http://lucids.github.io">Comments</a>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>On Reading SICP (04)</p>
+
+<h3>About</h3>
+
+<p>From page 48 to page 66.</p>
+
+<p>From exercise 1.29 to exercise 1.34.</p>
+
+<h3>Notes</h3>
+
+<p>I like this section, the notion of <code>accumulation</code> and <code>filter</code> is introduced, which are my favourite functional programming tools.</p>
+
+<p>Also, the idea, that <code>let</code> is syntactical sugar of <code>lambda</code>, is pretty interesting.</p>
+
+<figure class='code'><figcaption><span>let and lambda</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">let </span><span class="p">((</span><span class="nf">var1</span> <span class="nv">exp1</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nf">var2</span> <span class="nv">exp2</span><span class="p">)</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="p">(</span><span class="nf">varn</span> <span class="nv">expn</span><span class="p">))</span>
+</span><span class='line'><span class="nv">body</span><span class="p">)</span>
+</span><span class='line'><span class="c1">; is the equivalent of</span>
+</span><span class='line'><span class="p">((</span><span class="k">lambda </span><span class="p">(</span><span class="nf">var1</span> <span class="nv">var2</span> <span class="o">...</span> <span class="nv">varn</span><span class="p">)</span> <span class="nv">body</span><span class="p">)</span>
+</span><span class='line'><span class="nv">exp1</span>
+</span><span class='line'><span class="nv">exp2</span>
+</span><span class='line'><span class="o">...</span>
+</span><span class='line'><span class="nv">expn</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">```</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">###</span> <span class="nv">Exercises</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">####</span> <span class="mf">1.29</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">In</span> <span class="nv">order</span> <span class="nv">to</span> <span class="nv">reuse</span> <span class="o">`</span><span class="nv">sum</span><span class="o">`,</span> <span class="nv">I</span> <span class="k">define </span><span class="o">`</span><span class="nv">fk</span><span class="o">`,</span> <span class="nv">which</span> <span class="nv">may</span> <span class="nv">be</span> <span class="nv">a</span> <span class="nv">little</span> <span class="nv">weird</span><span class="o">.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>scm program
+(define (sum term a next b)
+(if (> a b)
+0
+(+ (term a)
+(sum term (next a) next b))))</p>
+
+<p>(define (square x)(* x x))</p>
+
+<p>(define (integral f a b dx)
+(define (add-dx x) (+ x dx))
+(* (sum f (+ a (/ dx 2.0)) add-dx b) dx))</p>
+
+<p>(define (simpson-integral f a b n)
+(let ((h (/ (&ndash; b a) n)))
+(define (yk k) (+ a (<em> k h)))
+(define (inc x) (+ x 1))
+(define (fk x)
+(cond
+((= x 0) (f a))
+((= x n) (f b))
+((even? x) (</em> 2 (f (yk x))))
+(else (<em> 4 (f (yk x))))))
+(</em> (sum fk 0 inc n) (/ (&ndash; b a) 3.0 n))
+))</p>
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">It</span><span class="o">`</span><span class="nv">s</span> <span class="nv">more</span> <span class="nv">precise</span> <span class="nv">indeed,</span> <span class="nv">wow!</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>scm comparison</p>
+
+<blockquote><p>(simpson-integral square 0 1 100)
+0.3333333333333333
+(integral square 0 1 0.01)
+0.33332500000000054</p></blockquote>
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">####</span> <span class="mf">1.30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>scm
+(define (sum term a next b)
+(define (iter a result)
+(if (> a b) result
+(iter (next a) (+ result (term a)))))
+(iter a 0))</p>
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">####</span> <span class="mf">1.31</span>
+</span><span class='line'>
+</span><span class='line'><span class="nv">It</span> <span class="nv">can</span> <span class="nv">be</span> <span class="nv">generated</span> <span class="nv">by</span> <span class="o">`</span><span class="nv">s/+/*/</span> <span class="nv">s/0/1/</span> <span class="nv">s/sum/prod/</span><span class="o">`.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>scm
+(define (prod-rec term a next b)
+(if (> a b) 1
+(* (term a) (prod-rec term (next a) next b))))</p>
+
+<p>(define (prod-iter term a next b)
+(define (iter a result)
+(if (> a b) result
+(iter (next a) (* result (term a)))))
+(iter a 1))</p>
+
+<figure class='code'><figcaption><span>lambda equivalent</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="o">```</span><span class="nv">scm</span> <span class="nv">sample</span> <span class="nv">output</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-rec</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">5</span><span class="p">)</span>
+</span><span class='line'><span class="mi">120</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-iter</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">5</span><span class="p">)</span>
+</span><span class='line'><span class="mi">120</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.32</h4>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">accum-rec</span> <span class="nv">op</span> <span class="nv">init</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">init</span>
+</span><span class='line'><span class="p">(</span><span class="nf">op</span> <span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">accum-rec</span> <span class="nv">op</span> <span class="nv">init</span> <span class="nv">term</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">))))</span>
+</span><span class='line'>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">accum-iter</span> <span class="nv">op</span> <span class="nv">init</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">if </span><span class="p">(</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">result</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">op</span> <span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">result</span><span class="p">))))</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">init</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sample output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">accum-rec</span> <span class="nv">+</span> <span class="mi">0</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="mi">1</span> <span class="nv">x</span><span class="p">))</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'><span class="mi">55</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">accum-iter</span> <span class="nv">+</span> <span class="mi">0</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="mi">1</span> <span class="nv">x</span><span class="p">))</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'><span class="mi">55</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.33</h4>
+
+<p>Finally I don`t have to write recursive and iterative version at once.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">filtered-accum</span> <span class="nv">op</span> <span class="nv">init</span> <span class="nv">term</span> <span class="nv">a</span> <span class="nv">next</span> <span class="nv">b</span> <span class="nv">filter</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">cond </span><span class="p">((</span><span class="nb">&gt; </span><span class="nv">a</span> <span class="nv">b</span><span class="p">)</span> <span class="nv">result</span><span class="p">)</span>
+</span><span class='line'><span class="p">((</span><span class="nf">filter</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="p">(</span><span class="nf">op</span> <span class="p">(</span><span class="nf">term</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">result</span><span class="p">)))</span>
+</span><span class='line'><span class="p">(</span><span class="k">else </span><span class="p">(</span><span class="nf">iter</span> <span class="p">(</span><span class="nf">next</span> <span class="nv">a</span><span class="p">)</span> <span class="nv">result</span><span class="p">))))</span>
+</span><span class='line'><span class="p">(</span><span class="nf">iter</span> <span class="nv">a</span> <span class="nv">init</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sample output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">filtered-accum</span> <span class="nv">+</span> <span class="mi">0</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="mi">10</span> <span class="nv">even?</span><span class="p">)</span>
+</span><span class='line'><span class="mi">30</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sum of the squares of the prime numbers in the interval a to b</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">sum-prime-squares</span> <span class="nv">a</span> <span class="nv">b</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nf">filtered-accum</span>
+</span><span class='line'><span class="nv">+</span> <span class="mi">0</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">* </span><span class="nv">x</span> <span class="nv">x</span><span class="p">))</span> <span class="nv">a</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="nv">b</span> <span class="nv">prime?</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>product of all positive integers i < n such that GCD(i, n) = 1</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">prod-relative-primes-less-than</span> <span class="nv">n</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="nf">filtered-accum</span>
+</span><span class='line'><span class="nv">*</span> <span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="nv">x</span><span class="p">)</span>
+</span><span class='line'><span class="mi">1</span> <span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">+ </span><span class="nv">x</span> <span class="mi">1</span><span class="p">))</span> <span class="p">(</span><span class="nb">- </span><span class="nv">n</span> <span class="mi">1</span><span class="p">)</span>
+</span><span class='line'><span class="p">(</span><span class="k">lambda </span><span class="p">(</span><span class="nf">x</span><span class="p">)</span> <span class="p">(</span><span class="nb">= </span><span class="p">(</span><span class="nb">gcd </span><span class="nv">x</span> <span class="nv">n</span><span class="p">)</span> <span class="mi">1</span><span class="p">))))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+<figure class='code'><figcaption><span>sample output</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">sum-prime-squares</span> <span class="mi">1</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'><span class="mi">87</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">prod-relative-primes-less-than</span> <span class="mi">10</span><span class="p">)</span>
+</span><span class='line'><span class="mi">189</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h4>1.34</h4>
+
+<p>Given</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">f</span> <span class="nv">g</span><span class="p">)</span> <span class="p">(</span><span class="nf">g</span> <span class="mi">2</span><span class="p">))</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>which <code>f</code> would receive a function <code>g</code> then return the result that apply <code>g</code> with <code>2</code>.</p>
+
+<p>Since scheme uses applicative-order evaluation, I think <code>(f f)</code> would become <code>(f 2)</code> then <code>(2 2)</code>, since <code>2</code> is a number instead of a function, it would pop up an error here.</p>
+
+<p>Then my thought was proved :)</p>
+
+<figure class='code'><figcaption><span>experiment</span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='scm'><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="k">define </span><span class="p">(</span><span class="nf">f</span> <span class="nv">g</span><span class="p">)</span> <span class="p">(</span><span class="nf">g</span> <span class="mi">2</span><span class="p">))</span>
+</span><span class='line'><span class="nv">&gt;</span> <span class="p">(</span><span class="nf">f</span> <span class="mi">2</span><span class="p">)</span>
+</span><span class='line'><span class="o">.</span> <span class="o">.</span> <span class="nv">application:</span> <span class="nv">not</span> <span class="nv">a</span> <span class="nv">procedure</span><span class="c1">;</span>
+</span><span class='line'><span class="nv">expected</span> <span class="nv">a</span> <span class="nv">procedure</span> <span class="nv">that</span> <span class="nv">can</span> <span class="nv">be</span> <span class="nv">applied</span> <span class="nv">to</span> <span class="nv">arguments</span>
+</span><span class='line'><span class="nv">given:</span> <span class="mi">2</span>
+</span><span class='line'><span class="nv">arguments</span><span class="o">...</span><span class="nv">:</span>
+</span><span class='line'><span class="mi">2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Lucids</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-02-15T21:28:07+00:00" pubdate data-updated="true">Feb 15<span>th</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/programming/'>Programming</a>, <a class='category' href='/blog/categories/reading/'>Reading</a>, <a class='category' href='/blog/categories/sicp/'>SICP</a>, <a class='category' href='/blog/categories/scheme/'>Scheme</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="//twitter.com/share" class="twitter-share-button" data-url="http://lucids.github.io/blog/on-reading-sicp-04/" data-via="" data-counturl="http://lucids.github.io/blog/on-reading-sicp-04/" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/on-reading-sicp-03/" title="Previous Post: On Reading SICP (03)">&laquo; On Reading SICP (03)</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section>
+  <h1>About Me</h1>
+  <img src="http://imgur.com/nZXZVhG.png" width="128px" height="128px">
+  <p>My name is Peng Gong. I am a software engineer from China.</p>
+  <p>I got a B.S. degree from <a href="http://www.dlut.edu.cn" target="_blank">DLUT</a> and a M.S. degree <a href="http://www.buaa.edu.cn" target="_blank">BUAA</a>, both of them are in computer science.</p>
+  <p>I am founder of <a href="http://www.windowsphone.com/zh-cn/store/publishers?publisherId=LucSoft&amp;appId=3e4f73b2-c70e-40dd-b3b8-1d2135e9af56" target="_blank">LucSoft</a> and <a href="http://www.windowsphone.com/zh-cn/store/publishers?publisherId=IdaSoft&amp;appId=7f06890c-60d6-4ec7-880d-24a9dd24a283" target="_blank">IdaSoft</a>, which got some 100,000+ users apps like <a href="http://www.windowsphone.com/zh-cn/store/app/%E4%B8%AD%E6%96%87%E6%8B%A8%E5%8F%B7%E5%8A%A9%E6%89%8B/3e4f73b2-c70e-40dd-b3b8-1d2135e9af56" target="_blank">RazorDialer</a> and <a href="http://www.windowsphone.com/zh-cn/store/app/%E9%87%91%E5%BA%B8%E5%85%A8%E9%9B%86/7f06890c-60d6-4ec7-880d-24a9dd24a283" target="_blank">JoyReader</a>,</p>
+  <p><a href="http://book.douban.com/people/figure9/" target="_blank">Readings</a> and <a href="http://book.douban.com/people/figure9/reviews" target="_blank">reviews</a>.</p>
+  <p>I am currently working at <a href="http://www.google.co.uk/about/jobs/locations/london/" target="_blank">Google London</a>,</p>
+  <p>I blog for myself, nothing here represents the views, options or proclivities of my employer.</p>
+</section><section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/on-reading-sicp-04/">On Reading SICP (04)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/on-reading-sicp-03/">On Reading SICP (03)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/on-reading-sicp-02/">On Reading SICP (02)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/on-reading-sicp-01/">On Reading SICP (01)</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/a-taste-of-functional-programming-in-java-7/">A Taste of Functional Programming in Java 7, Java 8 and C# 4</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/blog/categories/c-'>C# (1)</a></li><li><a href='/blog/categories/java'>Java (1)</a></li><li><a href='/blog/categories/programming'>Programming (5)</a></li><li><a href='/blog/categories/reading'>Reading (4)</a></li><li><a href='/blog/categories/scheme'>Scheme (4)</a></li><li><a href='/blog/categories/sicp'>SICP (4)</a></li></ul>
+</section>
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Lucids -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'lucids';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://lucids.github.io/blog/on-reading-sicp-04/';
+        var disqus_url = 'http://lucids.github.io/blog/on-reading-sicp-04/';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = '//' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
